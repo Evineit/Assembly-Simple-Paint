@@ -1,0 +1,17 @@
+< THE SYMBOL TABLE >  prog5.com  --  emu8086 assembler version: 4.04 
+===================================================================================================
+Name                     	Offset    	Size      	Type      	Segment   
+===================================================================================================
+COL                      	00100     	2         	VAR       	(NOSEG)   
+REN                      	00102     	2         	VAR       	(NOSEG)   
+CODE                     	00104     	-1        	LABEL     	(NOSEG)   
+ETI0                     	0010A     	-1        	LABEL     	(NOSEG)   
+FIN                      	00137     	-1        	LABEL     	(NOSEG)   
+PRENDE                   	0013F     	-1        	NEAR      	(NOSEG)   
+APAGA                    	00145     	-1        	NEAR      	(NOSEG)   
+INIGRAF                  	0014B     	-1        	NEAR      	(NOSEG)   
+CIERRAGRAF               	00152     	-1        	NEAR      	(NOSEG)   
+===================================================================================================
+[ 04/12/2020  --  01:58:26 a. m. ] 
+< END >
+ 
