@@ -1,17 +1,103 @@
 UASM v2.49, Jun 21 2019, Masm-compatible assembler.
 
-prog5.asm
-                                ;Programa 5.- Enciende un PIXEL en la posición del click izquierdo (simulación LAPIZ)
-
-                                name test
-
+prog12.asm
+                                ;Programa 12.- Programa que carga o despliega una imagen BMP pixel por pixel en pantalla (640x480)
 00000000                        CSEG    SEGMENT     ; code segment starts here.
-                                org 0100h
-00000100  0000                  col dw ?
-00000102  0000                  ren dw ?
-
+                                org 100h
+00000100  EB57                  jmp eti0
+                                ;Zona de declaracion de Cadenas e Identificadores creados por el usuario (variables)
+00000102  4572726F722C206172    cad db 'Error, archivo no encontrado!...presione una tecla para terminar.$'
+00000144  433A5C696D6167656E    filename db "C:\imagen.bmp" ;Unidad Logica, Ruta, Nombre y Extension del archivo de imagen a utilizar
+00000151  0000                  handle dw ? ;DW=Define Word, para almacenar valores entre 0 y 65535, o sea 16 bits
+00000153  0000                  col dw 0 ;COL=0
+00000155  DF01                  ren dw 479 ;REN=479d
+00000157  00                    buffer db ? ;DB=Define Byte, para almacenar valores entre 0 y 255, o sea 8 bits
+00000158  00                    colo db ? ; ? = Valor NO definido de inicio
+                                ;**************************************************************************************************************************
                                 .code
-                                ponpix macro c,r ;Macro que recibe dos parámetros, en C y en R
+00000159                        eti0:
+00000159  B43D                  mov ah,3dh ;Funcion 3DH, abre un archivo existente
+0000015B  B000                  mov al,0 ;AL=Modos de Acceso, 0=Solo Lectura, 1=Escritura, 2=Lectura/Escritura
+0000015D  BA0000                 mov dx,offset filename ;DX=Direccion de la cadena de RUTA
+00000160  CD21                   int 21h ;INT 21H función 3DH, abre un archivo. Esta funcion altera la bandera CF (Carry
+                                ;Flag), si el archivo se pudo abrir sin error CF=0, y en AX esta el Manejador de Archivo
+                                ;(Handle), caso contrario CF=1, y en AX esta el codigo de error
+00000162  7303E9B200             jc err ;Si hay error, salta a la etiqueta ERR
+00000167  2EA30000               mov handle,ax ;Caso contrario HANDLE=Manejador de Archivo
+                                ;*************************************************************************************************************************
+0000016B  B97600                 mov cx,118d ;Se prepara ciclo de 118 vueltas (Para leer archivo en formato BMP)
+0000016E                        eti1:
+0000016E  51                     push cx
+0000016F  B43F                   mov ah,3fh ;3FH=Leer del archivo
+00000171  2E8B1E0000             mov bx,handle
+00000176  BA0000                 mov dx,offset buffer
+00000179  B90100                 mov cx,1 ;CX=Numero de Bytes a leer
+0000017C  CD21                   int 21h ;INT 21H funcion 3FH, leer del archivo
+0000017E  59                     pop cx
+0000017F  E2ED                   loop eti1
+                                ;*************************************************************************************************************************
+00000181  B400                   mov ah,00h ;Funcion 00H para la INT 10H (Resolucion de Pantalla)
+00000183  B012                   mov al,18d ;AL=Modo de despliegue o resolución, 18 = 640x480 a 16 colores
+00000185  CD10                   int 10h ;INT 10H funcion 00H, inicializar resolucion
+                                 ;***********************************************************************************************************************
+00000187                        eti2:
+00000187  B43F                   mov ah,3fh ;3FH=Leer del archivo
+00000189  2E8B1E0000             mov bx,handle
+0000018E  BA0000                 mov dx,offset buffer
+00000191  B90100                 mov cx,1
+00000194  CD21                   int 21h ;INT 21H funcion 3FH, leer del archivo. En BUFFER se almacenaran los datos leidos
+
+00000196  2EA00000               mov al,buffer ;AL=BUFFER, en los 4 bits superiores esta el color de un PRIMER Pixel
+0000019A  24F0                   and al,11110000b
+0000019C  C0C804                 ror al,4
+0000019F  2EA20000               mov colo,al ;COLO=Color de un PRIMER Pixel
+000001A3  B40C                   mov ah,0ch ;Funcion 0CH para despliegue de un solo PIXEL con atributos
+000001A5  2EA00000               mov al,colo ;AL=Atributos del Pixel
+000001A9  2E8B0E0000             mov cx,col ;CX=Columna de despliegue del Pixel
+000001AE  2E8B160000            mov dx,ren ;DX=Renglon de desplieguie del Pixel
+000001B3  CD10                   int 10h ;INT 10H funcion 0CH, pinta Pixel en coordenadas CX, DX
+
+000001B5  2EA00000               mov al,buffer ;AL=BUFFER, en los 4 bits inferiores esta el color de un SEGUNDO Pixel
+000001B9  240F                   and al,00001111b
+000001BB  2EA20000               mov colo,al ;COLO=Color de un SEGUNDO Pixel
+000001BF  2EFF060000             inc col
+000001C4  B40C                   mov ah,0ch ;Funcion 0CH para despliegue de un solo PIXEL con atributos
+000001C6  2EA00000               mov al,colo ;AL=Atributos del Pixel
+000001CA  2E8B0E0000             mov cx,col ;CX=Columna de despliegue del Pixel
+000001CF  2E8B160000             mov dx,ren ;DX=Renglon de desplieguie del Pixel
+000001D4  CD10                   int 10h ;INT 10H funcion 0CH, pinta Pixel en coordenadas CX, DX
+000001D6  2EFF060000             inc col ;Se debe desplegar otro Pixel para dar FORMATO a la imagen
+000001DB  B40C                   mov ah,0ch ;Funcion 0CH para despliegue de un solo PIXEL con atributos
+000001DD  2EA00000               mov al,colo ;AL=Atributos del Pixel
+000001E1  2E8B0E0000             mov cx,col ;CX=Columna de despliegue del Pixel
+000001E6  2E8B160000             mov dx,ren ;DX=Renglon de desplieguie del Pixel
+000001EB  CD10                   int 10h ;INT 10H funcion 0CH, pinta Pixel en coordenadas CX, DX
+
+000001ED  2E813E00007F02         cmp col,639d
+000001F4  7691                   jbe eti2 ;JBE=Jump if Below or Equal (salta si esta abajo o si es igual)
+
+000001F6  2EC70600000000         mov col,0
+000001FD  2EFF0E0000             dec ren
+00000202  2E833E0000FF           cmp ren,-1 ;Se compara con -1 para llegar hasta el ultimo renglon, que es el CERO
+00000208  7403E97AFF             jne eti2 ;JNE=Jump if Not Equal (salta si no es igual)
+0000020D  EB18                  jmp start
+                                 ;***********************************************************************************************************************
+0000020F  B407                   mov ah,07h
+00000211  CD21                   int 21h ;Espera que se oprima una tecla
+00000213  B400                   mov ah,00h ;Funcion 00H para devolver al modo TEXTO
+00000215  B003                   mov al,3d ;AL=Modo de despliegue o resolución, 3 = 80x25 a 16 colores (Modo TEXTO)
+00000217  CD10                   int 10h ;INT 10H funcion 00H, inicializar resolucion
+                                ;  int 20h ;Fin del Programa (Cuando se carga la imagen)
+                                ;***********************************************************************************************************************
+00000219                        err: ;Se llega hasta aqui solo si hay error en la lectura del archivo
+00000219  B409                   mov ah,09h
+0000021B  8D160000               lea dx,cad
+0000021F  CD21                   int 21h ;Despliega cad
+00000221  B407                   mov ah,07h
+00000223  CD21                   int 21h ;Espera a que se oprima tecla
+00000225  CD20                   int 20h ;Fin del Programa (Cuando NO se carga la imagen)
+
+                                 ponpix macro c,r ;Macro que recibe dos parámetros, en C y en R
  >                               mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL ;Macro que recibe dos parámetros, en C y en R
  >                               mov al,00001010b ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color) ;Macro que recibe dos parámetros, en C y en R
  >                              ;  mov cx,c ;Cx=Columna donde se despliega PIXEL (empieza desde cero) ;Macro que recibe dos parámetros, en C y en R
@@ -19,61 +105,63 @@ prog5.asm
  >                               int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon) ;Macro que recibe dos parámetros, en C y en R
  >                              endm ;Macro que recibe dos parámetros, en C y en R
                                 ;Inicio del Programa Principal
-00000104  E83B00                call inigraf ;Llama al procedimiento para iniciar graficos
-00000107                        etip:
-00000107  E82C00                call prende ;Llama al procedimiento para prender el raton
-0000010A                        eti0:
-0000010A  B80300                    mov ax,3d
-0000010D  CD33                      int 33h ;Detecta coordenadas y boton oprimido
-0000010F  83FB00                    cmp bx,0d
-00000112  74F3                      je etip ;Mientras NO se oprima ningun boton, se cicla
-00000114  83FB01                    cmp bx,1d
-00000117  7515                      jne fin ;El programa termina si se oprime el boton derecho o los 2 botones
-00000119  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
-0000011E  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
-00000123  E81600                    call apaga ;Llama al procedimiento APAGA para apagar el raton
+00000227                        start:
+                                ; call inigraf ;Llama al procedimiento para iniciar graficos
+00000227                        etip:
+00000227  E82C00                call prende ;Llama al procedimiento para prender el raton
+0000022A                        eti10:
+0000022A  B80300                    mov ax,3d
+0000022D  CD33                      int 33h ;Detecta coordenadas y boton oprimido
+0000022F  83FB00                    cmp bx,0d
+00000232  74F3                      je etip ;Mientras NO se oprima ningun boton, se cicla
+00000234  83FB01                    cmp bx,1d
+00000237  7515                      jne fin ;El programa termina si se oprime el boton derecho o los 2 botones
+00000239  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
+0000023E  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
+00000243  E81600                    call apaga ;Llama al procedimiento APAGA para apagar el raton
                                     ponpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
-00000126  B40C               1   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000128  B00A               1   mov al,00001010b ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
+00000246  B40C               1   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
+00000248  B00A               1   mov al,00001010b ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
 
 
-0000012A  CD10               1   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
+0000024A  CD10               1   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
                                     ; call prende ;Llama al procedimiento PRENDE para prender el raton
-0000012C  EBDC                      jmp eti0 ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
+0000024C  EBDC                      jmp eti10 ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
                                     
-0000012E                        fin:
-0000012E  E80B00                 call apaga ;Apaga raton
-00000131  E81500                 call cierragraf ;Cierra graficos
-00000134  CD20                   int 20h ;Termina el programa
+0000024E                        fin:
+0000024E  E80B00                 call apaga ;Apaga raton
+00000251  E81500                 call cierragraf ;Cierra graficos
+00000254  CD20                   int 20h ;Termina el programa
 
                                 ;Inicia Zona de Procedimientos
-00000136                        prende proc
-00000136  B80100                 mov ax,1d
-00000139  CD33                   int 33h
-0000013B                         ret
-0000013C                        apaga proc
-0000013C  B80200                 mov ax,2d
-0000013F  CD33                   int 33h
-00000141                         ret
-00000142                        inigraf proc
-00000142  B400                   mov ah,0d
-00000144  B012                   mov al,18d
-00000146  CD10                   int 10h
-00000148                         ret
-00000149                        cierragraf proc
-00000149  B400                   mov ah,0d
-0000014B  B003                   mov al,3d
-0000014D  CD10                   int 10h
-0000014F                         ret 
+00000256                        prende proc
+00000256  B80100                 mov ax,1d
+00000259  CD33                   int 33h
+0000025B                         ret
+0000025C                        apaga proc
+0000025C  B80200                 mov ax,2d
+0000025F  CD33                   int 33h
+00000261                         ret
+00000262                        inigraf proc
+00000262  B400                   mov ah,0d
+00000264  B012                   mov al,18d
+00000266  CD10                   int 10h
+00000268                         ret
+00000269                        cierragraf proc
+00000269  B400                   mov ah,0d
+0000026B  B003                   mov al,3d
+0000026D  CD10                   int 10h
+0000026F                         ret 
+
 
 
 Binary Map:
 
 Segment                  Pos(file)     RVA  Size(fil) Size(mem)
 ---------------------------------------------------------------
-CSEG                            0      100        50        50
+CSEG                            0      100       170       170
 ---------------------------------------------------------------
-                                                  50        50
+                                                 170       170
 
 
 Macros:
@@ -453,17 +541,17 @@ Segments and Groups:
 
                 N a m e                 Size     Length   Align   Combine Class
 
-CSEG . . . . . . . . . . . . . .        16 Bit   0150     Para    Private ''
+CSEG . . . . . . . . . . . . . .        16 Bit   0270     Para    Private ''
 
 
 Procedures, parameters and locals:
 
                 N a m e                 Type     Value    Segment  Length
 
-apaga  . . . . . . . . . . . . .        P Near   013C     CSEG     0000 Public   
-cierragraf . . . . . . . . . . .        P Near   0149     CSEG     0000 Public   
-inigraf  . . . . . . . . . . . .        P Near   0142     CSEG     0000 Public   
-prende . . . . . . . . . . . . .        P Near   0136     CSEG     0000 Public   
+apaga  . . . . . . . . . . . . .        P Near   025C     CSEG     0000 Public   
+cierragraf . . . . . . . . . . .        P Near   0269     CSEG     0000 Public   
+inigraf  . . . . . . . . . . . .        P Near   0262     CSEG     0000 Public   
+prende . . . . . . . . . . . . .        P Near   0256     CSEG     0000 Public   
 
 
 Symbols:
@@ -472,10 +560,20 @@ Symbols:
 
 BuildDOS . . . . . . . . . . . .        Text   1
 DosVGA . . . . . . . . . . . . .        Text   1
-col  . . . . . . . . . . . . . .        Word             100h CSEG 
-eti0 . . . . . . . . . . . . . .        L Near           10Ah CSEG 
-etip . . . . . . . . . . . . . .        L Near           107h CSEG 
-fin  . . . . . . . . . . . . . .        L Near           12Eh CSEG 
-ren  . . . . . . . . . . . . . .        Word             102h CSEG 
+buffer . . . . . . . . . . . . .        Byte             157h CSEG 
+cad  . . . . . . . . . . . . . .        Byte[66]         102h CSEG 
+col  . . . . . . . . . . . . . .        Word             153h CSEG 
+colo . . . . . . . . . . . . . .        Byte             158h CSEG 
+err  . . . . . . . . . . . . . .        L Near           219h CSEG 
+eti0 . . . . . . . . . . . . . .        L Near           159h CSEG 
+eti1 . . . . . . . . . . . . . .        L Near           16Eh CSEG 
+eti10  . . . . . . . . . . . . .        L Near           22Ah CSEG 
+eti2 . . . . . . . . . . . . . .        L Near           187h CSEG 
+etip . . . . . . . . . . . . . .        L Near           227h CSEG 
+filename . . . . . . . . . . . .        Byte[13]         144h CSEG 
+fin  . . . . . . . . . . . . . .        L Near           24Eh CSEG 
+handle . . . . . . . . . . . . .        Word             151h CSEG 
+ren  . . . . . . . . . . . . . .        Word             155h CSEG 
+start  . . . . . . . . . . . . .        L Near           227h CSEG 
 
-prog5.asm: 59 lines, 2 passes, 12 ms, 0 warnings, 0 errors
+prog12.asm: 146 lines, 2 passes, 6 ms, 0 warnings, 0 errors
