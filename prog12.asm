@@ -77,15 +77,14 @@ mov dx,ren ;DX=Renglon de desplieguie del Pixel
  dec ren
  cmp ren,-1 ;Se compara con -1 para llegar hasta el ultimo renglon, que es el CERO
  jne eti2 ;JNE=Jump if Not Equal (salta si no es igual)
+jmp start
  ;***********************************************************************************************************************
  mov ah,07h
  int 21h ;Espera que se oprima una tecla
-
  mov ah,00h ;Funcion 00H para devolver al modo TEXTO
  mov al,3d ;AL=Modo de despliegue o resolución, 3 = 80x25 a 16 colores (Modo TEXTO)
  int 10h ;INT 10H funcion 00H, inicializar resolucion
-
- int 20h ;Fin del Programa (Cuando se carga la imagen)
+;  int 20h ;Fin del Programa (Cuando se carga la imagen)
 ;***********************************************************************************************************************
 err: ;Se llega hasta aqui solo si hay error en la lectura del archivo
  mov ah,09h
@@ -95,4 +94,54 @@ err: ;Se llega hasta aqui solo si hay error en la lectura del archivo
  int 21h ;Espera a que se oprima tecla
  int 20h ;Fin del Programa (Cuando NO se carga la imagen)
 
- 
+ ponpix macro c,r ;Macro que recibe dos parámetros, en C y en R
+ mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
+ mov al,00001010b ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
+;  mov cx,c ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
+;  mov dx,r ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
+ int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
+endm
+;Inicio del Programa Principal
+start:
+; call inigraf ;Llama al procedimiento para iniciar graficos
+etip:
+call prende ;Llama al procedimiento para prender el raton
+eti10:
+    mov ax,3d
+    int 33h ;Detecta coordenadas y boton oprimido
+    cmp bx,0d
+    je etip ;Mientras NO se oprima ningun boton, se cicla
+    cmp bx,1d
+    jne fin ;El programa termina si se oprime el boton derecho o los 2 botones
+    mov col,cx ;Carga en COL el valor de la columna
+    mov ren,dx ;Carga en REN el valor del renglon
+    call apaga ;Llama al procedimiento APAGA para apagar el raton
+    ponpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
+    ; call prende ;Llama al procedimiento PRENDE para prender el raton
+    jmp eti10 ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
+    
+fin:
+ call apaga ;Apaga raton
+ call cierragraf ;Cierra graficos
+ int 20h ;Termina el programa
+
+;Inicia Zona de Procedimientos
+prende proc
+ mov ax,1d
+ int 33h
+ ret
+apaga proc
+ mov ax,2d
+ int 33h
+ ret
+inigraf proc
+ mov ah,0d
+ mov al,18d
+ int 10h
+ ret
+cierragraf proc
+ mov ah,0d
+ mov al,3d
+ int 10h
+ ret 
+

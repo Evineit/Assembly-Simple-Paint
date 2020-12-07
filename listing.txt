@@ -576,4 +576,4 @@ handle . . . . . . . . . . . . .        Word             151h CSEG
 ren  . . . . . . . . . . . . . .        Word             155h CSEG 
 start  . . . . . . . . . . . . .        L Near           227h CSEG 
 
-prog12.asm: 146 lines, 2 passes, 6 ms, 0 warnings, 0 errors
+prog12.asm: 146 lines, 2 passes, 8 ms, 0 warnings, 0 errors
