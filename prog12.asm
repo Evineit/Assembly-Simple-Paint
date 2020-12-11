@@ -3,6 +3,7 @@ CSEG    SEGMENT     ; code segment starts here.
 org 100h
 jmp eti0
 ;Zona de declaracion de Cadenas e Identificadores creados por el usuario (variables)
+.data
 cad db 'Error, archivo no encontrado!...presione una tecla para terminar.$'
 filename db "C:\imagen.bmp" ;Unidad Logica, Ruta, Nombre y Extension del archivo de imagen a utilizar
 handle dw ? ;DW=Define Word, para almacenar valores entre 0 y 65535, o sea 16 bits
@@ -34,7 +35,7 @@ eti1:
  loop eti1
 ;*************************************************************************************************************************
  mov ah,00h ;Funcion 00H para la INT 10H (Resolucion de Pantalla)
- mov al,18d ;AL=Modo de despliegue o resolución, 18 = 640x480 a 16 colores
+ mov al,12h ;AL=Modo de despliegue o resolución, 18 = 640x480 a 16 colores
  int 10h ;INT 10H funcion 00H, inicializar resolucion
  ;***********************************************************************************************************************
 eti2:
@@ -77,7 +78,8 @@ mov dx,ren ;DX=Renglon de desplieguie del Pixel
  dec ren
  cmp ren,-1 ;Se compara con -1 para llegar hasta el ultimo renglon, que es el CERO
  jne eti2 ;JNE=Jump if Not Equal (salta si no es igual)
-jmp start
+ mov colo,03h
+jmp start ; jumps to drawing section
  ;***********************************************************************************************************************
  mov ah,07h
  int 21h ;Espera que se oprima una tecla
@@ -94,9 +96,9 @@ err: ;Se llega hasta aqui solo si hay error en la lectura del archivo
  int 21h ;Espera a que se oprima tecla
  int 20h ;Fin del Programa (Cuando NO se carga la imagen)
 
- ponpix macro c,r ;Macro que recibe dos parámetros, en C y en R
+ ponpix macro co,re ;Macro que recibe dos parámetros, en C y en R
  mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
- mov al,00001010b ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
+ mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
 ;  mov cx,c ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
 ;  mov dx,r ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
  int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
@@ -113,10 +115,24 @@ eti10:
     je etip ;Mientras NO se oprima ningun boton, se cicla
     cmp bx,1d
     jne fin ;El programa termina si se oprime el boton derecho o los 2 botones
+    
+    ; Solo puede pintar en el cuadro blanco
+    cmp cx,178d
+    jb etip ;JB=Jump if Below (Brinca si esta abajo)
+    cmp cx,625d
+    ja etip ;JA=Jmp if Above (Brinca si esta arriba)
+    cmp dx,408d
+    ja etip
+    cmp dx,15d
+    jb etip
+
     mov col,cx ;Carga en COL el valor de la columna
     mov ren,dx ;Carga en REN el valor del renglon
     call apaga ;Llama al procedimiento APAGA para apagar el raton
     ponpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
+    ; ponpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
+    ; ponpix col+1,ren+1 ;Llama a la macro PONPIX para desplegar PIXEL
+    ; ponpix col,ren+1 ;Llama a la macro PONPIX para desplegar PIXEL
     ; call prende ;Llama al procedimiento PRENDE para prender el raton
     jmp eti10 ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
     

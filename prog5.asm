@@ -8,11 +8,11 @@ col dw ?
 ren dw ?
 
 .code
-ponpix macro c,r ;Macro que recibe dos parámetros, en C y en R
+ponpix macro co,re ;Macro que recibe dos parámetros, en C y en R
  mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
  mov al,00001010b ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-;  mov cx,c ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-;  mov dx,r ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
+ mov cx,co ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
+ mov dx,re ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
  int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
 endm
 ;Inicio del Programa Principal
