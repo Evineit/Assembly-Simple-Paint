@@ -380,15 +380,25 @@ eticolor14:
     jmp etip
 eticolor15:
     cmp dx,441d
-    jb eti10 ;JB=Jump if Below (Brinca si esta abajo)
+    jb etiexitbut ;JB=Jump if Below (Brinca si esta abajo)
     cmp dx,469d
-    ja eti10 ;JA=Jmp if Above (Brinca si esta arriba)
+    ja etiexitbut ;JA=Jmp if Above (Brinca si esta arriba)
     cmp cx,486d
-    ja eti10
+    ja etiexitbut
     cmp cx,458d
-    jb eti10
+    jb etiexitbut
     mov colo, 0fh
     jmp etip
+etiexitbut:
+    cmp dx,428d
+    jb eti10 ;JB=Jump if Below (Brinca si esta abajo)
+    cmp dx,470d
+    ja eti10 ;JA=Jmp if Above (Brinca si esta arriba)
+    cmp cx,620d
+    ja eti10
+    cmp cx,578d
+    jb eti10
+    jmp fin
     
 draw:
     mov col,cx ;Carga en COL el valor de la columna
