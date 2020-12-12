@@ -3,11 +3,12 @@ Todo:
     [] PEN
     [] Spray
     [] Square
-    [] Eraser
-    [] Color picker
+    [] Eraser @started(20-12-11 22:50)
+    [] Fix: Color stays white
+    [] Color picker after eraser
   ✔ Numeros con posicion X y Y @done(20-12-11 22:48)
   ✔ Choose colors @done(20-12-11 22:30) @lasted(2h51m16s)
   ✔ Exit Button @started(20-12-11 19:56) @done(20-12-11 22:47) @lasted(5min)
   ✔ Only paint in drawing area @done(20-12-10 22:20)
   [] Corregir col y ren
-
+  [] fix Overflow

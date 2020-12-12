@@ -1,7 +1,7 @@
 ;Programa 12.- Programa que carga o despliega una imagen BMP pixel por pixel en pantalla (640x480)
 CSEG    SEGMENT     ; code segment starts here.
-org 100h
-jmp eti0
+    org 100h
+    jmp eti0
 ;Zona de declaracion de Cadenas e Identificadores creados por el usuario (variables)
 .data
 cad db 'Error, archivo no encontrado!...presione una tecla para terminar.$'
@@ -12,6 +12,7 @@ ren dw 479 ;REN=479d
 ; afueras db 0
 buffer db ? ;DB=Define Byte, para almacenar valores entre 0 y 255, o sea 8 bits
 colo db ? ; ? = Valor NO definido de inicio
+tool db 1
 numero macro num
  mov ax,num
  mov bl,100d
@@ -391,16 +392,43 @@ eticolor15:
     jmp etip
 etiexitbut:
     cmp dx,428d
-    jb eti10 ;JB=Jump if Below (Brinca si esta abajo)
+    jb etitool1 ;JB=Jump if Below (Brinca si esta abajo)
     cmp dx,470d
-    ja eti10 ;JA=Jmp if Above (Brinca si esta arriba)
+    ja etitool1 ;JA=Jmp if Above (Brinca si esta arriba)
     cmp cx,620d
-    ja eti10
+    ja etitool1
     cmp cx,578d
-    jb eti10
+    jb etitool1
     jmp fin
+etitool1:
+    cmp dx,77d
+    jb etitool2 ;JB=Jump if Below (Brinca si esta abajo)
+    cmp dx,125d
+    ja etitool2 ;JA=Jmp if Above (Brinca si esta arriba)
+    cmp cx,19d
+    jb etitool2
+    cmp cx,67d
+    ja etitool2
+    mov tool,1d
+    jmp eti10
+etitool2:
+    cmp dx,77d
+    jb eti10 ;JB=Jump if Below (Brinca si esta abajo)
+    cmp dx,125d
+    ja eti10 ;JA=Jmp if Above (Brinca si esta arriba)
+    cmp cx,97d
+    jb eti10
+    cmp cx,145d
+    ja eti10
+    mov tool,2d
+    jmp eti10
     
 draw:
+    cmp tool,1
+    je drawpen
+    cmp tool,2
+    je draweraser
+drawpen:
     mov col,cx ;Carga en COL el valor de la columna
     mov ren,dx ;Carga en REN el valor del renglon
     call apaga ;Llama al procedimiento APAGA para apagar el raton
@@ -410,7 +438,15 @@ draw:
     ; ponpix col,ren+1 ;Llama a la macro PONPIX para desplegar PIXEL
     ; call prende ;Llama al procedimiento PRENDE para prender el raton
     jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
-    
+draweraser:
+    mov col,cx ;Carga en COL el valor de la columna
+    mov ren,dx ;Carga en REN el valor del renglon
+    call apaga ;Llama al procedimiento APAGA para apagar el raton
+    mov colo, 0fh
+    ponpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
+    jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
+
+
 fin:
  call apaga ;Apaga raton
  call cierragraf ;Cierra graficos
