@@ -13,6 +13,11 @@ ren dw 479 ;REN=479d
 buffer db ? ;DB=Define Byte, para almacenar valores entre 0 y 255, o sea 8 bits
 colo db ? ; ? = Valor NO definido de inicio
 tool db 1
+; datos para cuadro
+col1 dw ?
+ren1 dw ?
+col2 dw ?
+ren2 dw ?
 numero macro num
  mov ax,num
  mov bl,100d
@@ -178,7 +183,7 @@ borpix macro ren, col
     inc cx
     int 10h
     endm   
-;  TODO: Implement
+;  TODO: Implement, bigger eraser
 actualcolor macro
     ponpix 21d,145d;Llama a la macro PONPIX para desplegar PIXEL
     ponpix 22d,145d;Llama a la macro PONPIX para desplegar PIXEL
@@ -235,7 +240,7 @@ eti10:
     cmp bx,0d
     je etip ;Mientras NO se oprima ningun boton, se cicla
     cmp bx,1d
-    jne fin ;El programa termina si se oprime el boton derecho o los 2 botones
+    ; jne fin ;El programa termina si se oprime el boton derecho o los 2 botones
     
     ; Solo puede pintar en el cuadro blanco
     cmp cx,178d
@@ -462,6 +467,16 @@ etitool2:
     mov tool,2d
     jmp eti10
 etitool3:
+    cmp dx,143d
+    jb etitool4 ;JB=Jump if Below (Brinca si esta abajo)
+    cmp dx,192d
+    ja etitool4 ;JA=Jmp if Above (Brinca si esta arriba)
+    cmp cx,19d
+    jb etitool4
+    cmp cx,67d
+    ja etitool4
+    mov tool,3d
+    jmp eti10
 etitool4:
     cmp dx,141d
     jb eti10 ;JB=Jump if Below (Brinca si esta abajo)
@@ -479,6 +494,8 @@ draw:
     je drawpen
     cmp tool,2
     je draweraser
+    cmp tool,3
+    je drawsquare
     cmp tool,4
     je drawspray
 drawpen:
@@ -503,6 +520,9 @@ drawspray:
     call apaga ;Llama al procedimiento APAGA para apagar el raton
     spraypix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
     jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
+drawsquare:
+    call cuadro
+    jmp etip
 
 
 fin:
@@ -510,10 +530,68 @@ fin:
  call cierragraf ;Cierra graficos
  int 20h ;Termina el programa
 
-;Inicia Zona de Procedimientos 
+;------------------ Inicia Zona de Procedimientos ----------------------
 ; resetfuera proc
 ;     mov afueras,0
 ;     ret
+cuadro proc
+    mov col1,cx
+    mov ren1,dx
+    cuad0:
+    mov ax,3d
+    int 33h
+    cmp bx,2d
+    jne cuad0 ;Este ciclo (ETI1) solo termina si se oprime el botón Derecho
+    cmp cx,178d
+    jb cuad0 ;JB=Jump if Below (Brinca si esta abajo)
+    cmp cx,625d
+    ja cuad0 ;JA=Jmp if Above (Brinca si esta arriba)
+    cmp dx,408d
+    ja cuad0
+    cmp dx,15d
+    jb cuad0
+
+    mov col2,cx
+    mov ren2,dx
+    mov cx,col1
+    mov dx,ren1
+    cuad1: ;Inicia proceso para dibujar linea superior horizontal
+    mov ah,0ch
+    mov al,colo
+    int 10h ; Pone el primer pixel
+    inc cx
+    cmp cx,col2
+    jbe cuad1 ;JBE=Jump if Below or Equal (Salta si esta abajo, o si es Igual)
+    mov cx,col1
+    mov dx,ren2
+    cuad2: ;Inicia proceso para dibujar linea inferior horizontal
+    mov ah,0ch
+    mov al,colo
+    int 10h
+    inc cx
+    cmp cx,col2
+    jbe cuad2
+    mov cx,col1
+    mov dx,ren1
+    cuad3: ;Inicia proceso para dibujar linea izquierda vertical
+    mov ah,0ch
+    mov al,colo
+    int 10h
+    inc dx
+    cmp dx,ren2
+    jbe cuad3
+
+    mov cx,col2
+    mov dx,ren1
+    cuad4: ;Inicia proceso para dibujar linea derecha vertical
+    mov ah,0ch
+    mov al,colo
+    int 10h
+    inc dx
+    cmp dx,ren2
+    jbe cuad4
+    ret
+    cuadro endp
 prende proc
  mov ax,1d
  int 33h

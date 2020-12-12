@@ -1,22 +1,19 @@
-CSEG    SEGMENT     ; code segment starts here.
+cdseg segment
 ;Programa 8.- Dibuja un CUADRO empezando en la posicion del boton izquierdo, hasta la posición del botón derecho
 ;NOTA: El primer punto (con el Boton Izquierdo ) debe ser el Superior Izquierdo, y el Segundo punto (con el Boton
 ;Dereho) debe ser el Inferior Derecho
 org 0100h
-.data
 col1 dw ?
 ren1 dw ?
 col2 dw ?
 ren2 dw ?
-
-    
 .code
     mov ah,00h ;Inicio del Programa Principal
     mov al,18d
     int 10h
     mov ax,1d
-eti0:
     int 33h
+eti0:
     mov ax,3d
     int 33h
     cmp bx,1d
@@ -30,8 +27,19 @@ eti1:
     jne eti1 ;Este ciclo (ETI1) solo termina si se oprime el botón Derecho
     mov col2,cx
     mov ren2,dx
-    mov ax,2d
-    int 33h
+    ; Esto esconde el raton
+    ; mov ax,2d
+    ; int 33h
+    call cuadro
+    ; Regresa depues de dibujar un cuadro para seguir poniendo mas
+    jmp eti0
+    mov ah,07h
+    int 21h
+    mov ah,00h
+    mov al,3d
+    int 10h
+    int 20h ;Fin del Programa Principal
+cuadro proc
     mov cx,col1
     mov dx,ren1
     eti2: ;Inicia proceso para dibujar linea superior horizontal
@@ -71,11 +79,5 @@ eti1:
     inc dx
     cmp dx,ren2
     jbe eti5
-    jmp eti0
-    mov ah,07h
-    int 21h
-    mov ah,00h
-    mov al,3d
-    int 10h
-    int 20h ;Fin del Programa Principal
-
+    ret
+    cuadro endp
