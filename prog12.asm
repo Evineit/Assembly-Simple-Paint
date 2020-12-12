@@ -139,6 +139,21 @@ ponpix macro co,re ;Macro que recibe dos parámetros, en C y en R
  inc cx
  int 10h
  endm
+borpix macro ren, col
+    mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
+    mov al,0fh ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
+    mov cx,ren ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
+    mov dx,col ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
+    int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
+    inc cx
+    int 10h
+    inc cx
+    int 10h
+    inc cx
+    int 10h
+    inc cx
+    int 10h
+    endm   
 ;  TODO: Implement
 actualcolor macro
     ponpix 21d,145d;Llama a la macro PONPIX para desplegar PIXEL
@@ -442,8 +457,7 @@ draweraser:
     mov col,cx ;Carga en COL el valor de la columna
     mov ren,dx ;Carga en REN el valor del renglon
     call apaga ;Llama al procedimiento APAGA para apagar el raton
-    mov colo, 0fh
-    ponpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
+    borpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
     jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
 
 
