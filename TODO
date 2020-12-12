@@ -4,8 +4,9 @@ Todo:
   [] Spray
   [] Square
   [] Eraser
-  [] Choose colors
-  [] Exit Button
+  ✔ Choose colors @done(20-12-11 22:30)
+  [] Exit Button @started(20-12-11 19:56)
   [] Color picker
   ✔ Only paint in drawing area @done(20-12-10 22:20)
+  [] Corregir col y ren
 

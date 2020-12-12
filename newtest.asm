@@ -30,23 +30,23 @@ numero macro num
  add dl,30h
  mov ah,02h
  int 21h
-endm
+ endm
 ;Inicia Programa Principal
 .code
 jmp inicio
  cad db 'SALIR$'
 inicio:
-mov ah,00h
-mov al,18d
-int 10h
-mov co,37d
-mov re,11d
-call pos
-mov ah,09h
-lea dx,cad
-int 21h
-mov ax,1d
-int 33h
+    mov ah,00h
+    mov al,18d
+    int 10h
+    mov co,37d
+    mov re,11d
+    call pos
+    mov ah,09h
+    lea dx,cad
+    int 21h
+    mov ax,1d
+    int 33h
 eti0:
  mov ax,3d
  int 33h
