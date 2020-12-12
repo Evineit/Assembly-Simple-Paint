@@ -126,7 +126,31 @@ prog12.asm
 0000021E  B407                   mov ah,07h
 00000220  CD21                   int 21h ;Espera a que se oprima tecla
 00000222  CD20                   int 20h ;Fin del Programa (Cuando NO se carga la imagen)
-
+                                spraypix macro ren,col
+ >                               mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
+ >                               mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
+ >                               mov cx,ren ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
+ >                               mov dx,col ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
+ >                               push cx
+ >                               int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
+ >                               add cx,2d
+ >                               int 10h
+ >                               add cx,2d
+ >                               int 10h
+ >                               add cx,2d
+ >                               int 10h
+ >                               pop cx
+ >                               sub dx,2d
+ >                               int 10h
+ >                               sub dx,2d
+ >                               int 10h
+ >                               sub dx,2d
+ >                               int 10h
+ >                               sub dx,2d
+ >                               int 10h
+ >                               sub dx,2d
+ >                               int 10h
+ >                               endm
                                 ponpix macro co,re ;Macro que recibe dos parámetros, en C y en R
  >                               mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL ;Macro que recibe dos parámetros, en C y en R
  >                               mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color) ;Macro que recibe dos parámetros, en C y en R
@@ -195,7 +219,7 @@ prog12.asm
 00000224                        start:
                                 ; call inigraf ;Llama al procedimiento para iniciar graficos
 00000224                        etip:
-00000224  E8DD0A                    call prende ;Llama al procedimiento para prender el raton
+00000224  E8510B                    call prende ;Llama al procedimiento para prender el raton
                                     ; Muestra posicion en X y Y
 00000227  2E890E0000                mov col, cx
 0000022C  2E89160000                mov ren, dx
@@ -260,7 +284,7 @@ prog12.asm
 000002A6  83FB00                    cmp bx,0d
 000002A9  7503E976FF                je etip ;Mientras NO se oprima ningun boton, se cicla
 000002AE  83FB01                    cmp bx,1d
-000002B1  7403E9460A                jne fin ;El programa termina si se oprime el boton derecho o los 2 botones
+000002B1  7403E9BA0A                jne fin ;El programa termina si se oprime el boton derecho o los 2 botones
                                     
                                     ; Solo puede pintar en el cuadro blanco
 000002B6  81F9B200                  cmp cx,178d
@@ -271,7 +295,7 @@ prog12.asm
 000002C6  7708                      ja eticolor0
 000002C8  83FA0F                    cmp dx,15d
 000002CB  7203                      jb eticolor0
-000002CD  E9C209                    jmp draw
+000002CD  E9E209                    jmp draw
 000002D0                        eticolor0:
 000002D0  81FAB901                  cmp dx,441d
 000002D4  7303E98E01                jb eticolor1 ;JB=Jump if Below (Brinca si esta abajo)
@@ -1443,7 +1467,7 @@ prog12.asm
 00000C40  7709                      ja etitool1
 00000C42  81F94202                  cmp cx,578d
 00000C46  7203                      jb etitool1
-00000C48  E9B100                    jmp fin
+00000C48  E92501                    jmp fin
 00000C4B                        etitool1:
 00000C4B  83FA4D                    cmp dx,77d
 00000C4E  7218                      jb etitool2 ;JB=Jump if Below (Brinca si esta abajo)
@@ -1457,93 +1481,135 @@ prog12.asm
 00000C65  E939F6                    jmp eti10
 00000C68                        etitool2:
 00000C68  83FA4D                    cmp dx,77d
-00000C6B  7303E931F6                jb eti10 ;JB=Jump if Below (Brinca si esta abajo)
-00000C70  83FA7D                    cmp dx,125d
-00000C73  7603E929F6                ja eti10 ;JA=Jmp if Above (Brinca si esta arriba)
-00000C78  83F961                    cmp cx,97d
-00000C7B  7303E921F6                jb eti10
-00000C80  81F99100                  cmp cx,145d
-00000C84  7603E918F6                ja eti10
-00000C89  2EC606000002              mov tool,2d
-00000C8F  E90FF6                    jmp eti10
+00000C6B  7219                      jb etitool3 ;JB=Jump if Below (Brinca si esta abajo)
+00000C6D  83FA7D                    cmp dx,125d
+00000C70  7714                      ja etitool3 ;JA=Jmp if Above (Brinca si esta arriba)
+00000C72  83F961                    cmp cx,97d
+00000C75  720F                      jb etitool3
+00000C77  81F99100                  cmp cx,145d
+00000C7B  7709                      ja etitool3
+00000C7D  2EC606000002              mov tool,2d
+00000C83  E91BF6                    jmp eti10
+00000C86                        etitool3:
+00000C86                        etitool4:
+00000C86  81FA8D00                  cmp dx,141d
+00000C8A  7303E912F6                jb eti10 ;JB=Jump if Below (Brinca si esta abajo)
+00000C8F  81FABD00                  cmp dx,189d
+00000C93  7603E909F6                ja eti10 ;JA=Jmp if Above (Brinca si esta arriba)
+00000C98  83F961                    cmp cx,97d
+00000C9B  7303E901F6                jb eti10
+00000CA0  81F99100                  cmp cx,145d
+00000CA4  7603E9F8F5                ja eti10
+00000CA9  2EC606000004              mov tool,4d
+00000CAF  E9EFF5                    jmp eti10
                                     
-00000C92                        draw:
-00000C92  2E803E000001              cmp tool,1
-00000C98  7408                      je drawpen
-00000C9A  2E803E000002              cmp tool,2
-00000CA0  742E                      je draweraser
-00000CA2                        drawpen:
-00000CA2  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
-00000CA7  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
-00000CAC  E85B00                    call apaga ;Llama al procedimiento APAGA para apagar el raton
+00000CB2                        draw:
+00000CB2  2E803E000001              cmp tool,1
+00000CB8  7410                      je drawpen
+00000CBA  2E803E000002              cmp tool,2
+00000CC0  7436                      je draweraser
+00000CC2  2E803E000004              cmp tool,4
+00000CC8  745A                      je drawspray
+00000CCA                        drawpen:
+00000CCA  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
+00000CCF  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
+00000CD4  E8A700                    call apaga ;Llama al procedimiento APAGA para apagar el raton
                                     ponpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
-00000CAF  B40C               1   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000CB1  2EA00000           1   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000CB5  2E8B0E0000         1   mov cx,col ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000CBA  2E8B160000         1   mov dx,ren ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000CBF  CD10               1   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000CC1  41                 1   inc cx
-00000CC2  CD10               1   int 10h
-00000CC4  41                 1   inc cx
-00000CC5  CD10               1   int 10h
-00000CC7  41                 1   inc cx
-00000CC8  CD10               1   int 10h
-00000CCA  41                 1   inc cx
-00000CCB  CD10               1   int 10h
+00000CD7  B40C               1   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
+00000CD9  2EA00000           1   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
+00000CDD  2E8B0E0000         1   mov cx,col ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
+00000CE2  2E8B160000         1   mov dx,ren ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
+00000CE7  CD10               1   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
+00000CE9  41                 1   inc cx
+00000CEA  CD10               1   int 10h
+00000CEC  41                 1   inc cx
+00000CED  CD10               1   int 10h
+00000CEF  41                 1   inc cx
+00000CF0  CD10               1   int 10h
+00000CF2  41                 1   inc cx
+00000CF3  CD10               1   int 10h
                                     ; ponpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
                                     ; ponpix col+1,ren+1 ;Llama a la macro PONPIX para desplegar PIXEL
                                     ; ponpix col,ren+1 ;Llama a la macro PONPIX para desplegar PIXEL
                                     ; call prende ;Llama al procedimiento PRENDE para prender el raton
-00000CCD  E954F5                    jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
-00000CD0                        draweraser:
-00000CD0  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
-00000CD5  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
-00000CDA  E82D00                    call apaga ;Llama al procedimiento APAGA para apagar el raton
-                                    ; mov colo, 0fh
+00000CF5  E92CF5                    jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
+00000CF8                        draweraser:
+00000CF8  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
+00000CFD  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
+00000D02  E87900                    call apaga ;Llama al procedimiento APAGA para apagar el raton
                                     borpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
-00000CDD  B40C               1      mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000CDF  B00F               1      mov al,0fh ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000CE1  2E8B0E0000         1      mov cx,col ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000CE6  2E8B160000         1      mov dx,ren ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000CEB  CD10               1      int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000CED  41                 1      inc cx
-00000CEE  CD10               1      int 10h
-00000CF0  41                 1      inc cx
-00000CF1  CD10               1      int 10h
-00000CF3  41                 1      inc cx
-00000CF4  CD10               1      int 10h
-00000CF6  41                 1      inc cx
-00000CF7  CD10               1      int 10h
-00000CF9  E928F5                    jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
+00000D05  B40C               1      mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
+00000D07  B00F               1      mov al,0fh ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
+00000D09  2E8B0E0000         1      mov cx,col ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
+00000D0E  2E8B160000         1      mov dx,ren ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
+00000D13  CD10               1      int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
+00000D15  41                 1      inc cx
+00000D16  CD10               1      int 10h
+00000D18  41                 1      inc cx
+00000D19  CD10               1      int 10h
+00000D1B  41                 1      inc cx
+00000D1C  CD10               1      int 10h
+00000D1E  41                 1      inc cx
+00000D1F  CD10               1      int 10h
+00000D21  E900F5                    jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
+00000D24                        drawspray:
+00000D24  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
+00000D29  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
+00000D2E  E84D00                    call apaga ;Llama al procedimiento APAGA para apagar el raton
+                                    spraypix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
+00000D31  B40C               1   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
+00000D33  2EA00000           1   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
+00000D37  2E8B0E0000         1   mov cx,col ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
+00000D3C  2E8B160000         1   mov dx,ren ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
+00000D41  51                 1   push cx
+00000D42  CD10               1   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
+00000D44  83C102             1   add cx,2d
+00000D47  CD10               1   int 10h
+00000D49  83C102             1   add cx,2d
+00000D4C  CD10               1   int 10h
+00000D4E  83C102             1   add cx,2d
+00000D51  CD10               1   int 10h
+00000D53  59                 1   pop cx
+00000D54  83EA02             1   sub dx,2d
+00000D57  CD10               1   int 10h
+00000D59  83EA02             1   sub dx,2d
+00000D5C  CD10               1   int 10h
+00000D5E  83EA02             1   sub dx,2d
+00000D61  CD10               1   int 10h
+00000D63  83EA02             1   sub dx,2d
+00000D66  CD10               1   int 10h
+00000D68  83EA02             1   sub dx,2d
+00000D6B  CD10               1   int 10h
+00000D6D  E9B4F4                    jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
 
 
-00000CFC                        fin:
-00000CFC  E80B00                 call apaga ;Apaga raton
-00000CFF  E81500                 call cierragraf ;Cierra graficos
-00000D02  CD20                   int 20h ;Termina el programa
+00000D70                        fin:
+00000D70  E80B00                 call apaga ;Apaga raton
+00000D73  E81500                 call cierragraf ;Cierra graficos
+00000D76  CD20                   int 20h ;Termina el programa
 
                                 ;Inicia Zona de Procedimientos 
                                 ; resetfuera proc
                                 ;     mov afueras,0
                                 ;     ret
-00000D04                        prende proc
-00000D04  B80100                 mov ax,1d
-00000D07  CD33                   int 33h
-00000D09                         ret
-00000D0A                        apaga proc
-00000D0A  B80200                 mov ax,2d
-00000D0D  CD33                   int 33h
-00000D0F                         ret
-00000D10                        inigraf proc
-00000D10  B400                   mov ah,0d
-00000D12  B012                   mov al,18d
-00000D14  CD10                   int 10h
-00000D16                         ret
-00000D17                        cierragraf proc
-00000D17  B400                   mov ah,0d
-00000D19  B003                   mov al,3d
-00000D1B  CD10                   int 10h
-00000D1D                         ret 
+00000D78                        prende proc
+00000D78  B80100                 mov ax,1d
+00000D7B  CD33                   int 33h
+00000D7D                         ret
+00000D7E                        apaga proc
+00000D7E  B80200                 mov ax,2d
+00000D81  CD33                   int 33h
+00000D83                         ret
+00000D84                        inigraf proc
+00000D84  B400                   mov ah,0d
+00000D86  B012                   mov al,18d
+00000D88  CD10                   int 10h
+00000D8A                         ret
+00000D8B                        cierragraf proc
+00000D8B  B400                   mov ah,0d
+00000D8D  B003                   mov al,3d
+00000D8F  CD10                   int 10h
+00000D91                         ret 
 
 
 
@@ -1551,9 +1617,9 @@ Binary Map:
 
 Segment                  Pos(file)     RVA  Size(fil) Size(mem)
 ---------------------------------------------------------------
-CSEG                            0      100       C1E       C1E
+CSEG                            0      100       C92       C92
 ---------------------------------------------------------------
-                                                 C1E       C1E
+                                                 C92       C92
 
 
 Macros:
@@ -1633,6 +1699,7 @@ arginvoke  . . . . . . . . . . .        Func
 borpix . . . . . . . . . . . . .        Proc
 numero . . . . . . . . . . . . .        Proc
 ponpix . . . . . . . . . . . . .        Proc
+spraypix . . . . . . . . . . . .        Proc
 
 
 Structures and Unions:
@@ -1936,17 +2003,17 @@ Segments and Groups:
 
                 N a m e                 Size     Length   Align   Combine Class
 
-CSEG . . . . . . . . . . . . . .        16 Bit   0D1E     Para    Private ''
+CSEG . . . . . . . . . . . . . .        16 Bit   0D92     Para    Private ''
 
 
 Procedures, parameters and locals:
 
                 N a m e                 Type     Value    Segment  Length
 
-apaga  . . . . . . . . . . . . .        P Near   0D0A     CSEG     0000 Public   
-cierragraf . . . . . . . . . . .        P Near   0D17     CSEG     0000 Public   
-inigraf  . . . . . . . . . . . .        P Near   0D10     CSEG     0000 Public   
-prende . . . . . . . . . . . . .        P Near   0D04     CSEG     0000 Public   
+apaga  . . . . . . . . . . . . .        P Near   0D7E     CSEG     0000 Public   
+cierragraf . . . . . . . . . . .        P Near   0D8B     CSEG     0000 Public   
+inigraf  . . . . . . . . . . . .        P Near   0D84     CSEG     0000 Public   
+prende . . . . . . . . . . . . .        P Near   0D78     CSEG     0000 Public   
 
 
 Symbols:
@@ -1959,9 +2026,10 @@ buffer . . . . . . . . . . . . .        Byte             157h CSEG
 cad  . . . . . . . . . . . . . .        Byte[66]         102h CSEG 
 col  . . . . . . . . . . . . . .        Word             153h CSEG 
 colo . . . . . . . . . . . . . .        Byte             158h CSEG 
-draw . . . . . . . . . . . . . .        L Near           C92h CSEG 
-draweraser . . . . . . . . . . .        L Near           CD0h CSEG 
-drawpen  . . . . . . . . . . . .        L Near           CA2h CSEG 
+draw . . . . . . . . . . . . . .        L Near           CB2h CSEG 
+draweraser . . . . . . . . . . .        L Near           CF8h CSEG 
+drawpen  . . . . . . . . . . . .        L Near           CCAh CSEG 
+drawspray  . . . . . . . . . . .        L Near           D24h CSEG 
 err  . . . . . . . . . . . . . .        L Near           216h CSEG 
 eti0 . . . . . . . . . . . . . .        L Near           15Ah CSEG 
 eti1 . . . . . . . . . . . . . .        L Near           16Fh CSEG 
@@ -1987,11 +2055,13 @@ etiexitbut . . . . . . . . . . .        L Near           C30h CSEG
 etip . . . . . . . . . . . . . .        L Near           224h CSEG 
 etitool1 . . . . . . . . . . . .        L Near           C4Bh CSEG 
 etitool2 . . . . . . . . . . . .        L Near           C68h CSEG 
+etitool3 . . . . . . . . . . . .        L Near           C86h CSEG 
+etitool4 . . . . . . . . . . . .        L Near           C86h CSEG 
 filename . . . . . . . . . . . .        Byte[13]         144h CSEG 
-fin  . . . . . . . . . . . . . .        L Near           CFCh CSEG 
+fin  . . . . . . . . . . . . . .        L Near           D70h CSEG 
 handle . . . . . . . . . . . . .        Word             151h CSEG 
 ren  . . . . . . . . . . . . . .        Word             155h CSEG 
 start  . . . . . . . . . . . . .        L Near           224h CSEG 
 tool . . . . . . . . . . . . . .        Byte             159h CSEG 
 
-prog12.asm: 491 lines, 2 passes, 62 ms, 0 warnings, 0 errors
+prog12.asm: 534 lines, 2 passes, 53 ms, 0 warnings, 0 errors

@@ -123,7 +123,31 @@ err: ;Se llega hasta aqui solo si hay error en la lectura del archivo
  mov ah,07h
  int 21h ;Espera a que se oprima tecla
  int 20h ;Fin del Programa (Cuando NO se carga la imagen)
-
+spraypix macro ren,col
+ mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
+ mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
+ mov cx,ren ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
+ mov dx,col ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
+ push cx
+ int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
+ add cx,2d
+ int 10h
+ add cx,2d
+ int 10h
+ add cx,2d
+ int 10h
+ pop cx
+ sub dx,2d
+ int 10h
+ sub dx,2d
+ int 10h
+ sub dx,2d
+ int 10h
+ sub dx,2d
+ int 10h
+ sub dx,2d
+ int 10h
+ endm
 ponpix macro co,re ;Macro que recibe dos parámetros, en C y en R
  mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
  mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
@@ -428,14 +452,26 @@ etitool1:
     jmp eti10
 etitool2:
     cmp dx,77d
-    jb eti10 ;JB=Jump if Below (Brinca si esta abajo)
+    jb etitool3 ;JB=Jump if Below (Brinca si esta abajo)
     cmp dx,125d
+    ja etitool3 ;JA=Jmp if Above (Brinca si esta arriba)
+    cmp cx,97d
+    jb etitool3
+    cmp cx,145d
+    ja etitool3
+    mov tool,2d
+    jmp eti10
+etitool3:
+etitool4:
+    cmp dx,141d
+    jb eti10 ;JB=Jump if Below (Brinca si esta abajo)
+    cmp dx,189d
     ja eti10 ;JA=Jmp if Above (Brinca si esta arriba)
     cmp cx,97d
     jb eti10
     cmp cx,145d
     ja eti10
-    mov tool,2d
+    mov tool,4d
     jmp eti10
     
 draw:
@@ -443,6 +479,8 @@ draw:
     je drawpen
     cmp tool,2
     je draweraser
+    cmp tool,4
+    je drawspray
 drawpen:
     mov col,cx ;Carga en COL el valor de la columna
     mov ren,dx ;Carga en REN el valor del renglon
@@ -458,6 +496,12 @@ draweraser:
     mov ren,dx ;Carga en REN el valor del renglon
     call apaga ;Llama al procedimiento APAGA para apagar el raton
     borpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
+    jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
+drawspray:
+    mov col,cx ;Carga en COL el valor de la columna
+    mov ren,dx ;Carga en REN el valor del renglon
+    call apaga ;Llama al procedimiento APAGA para apagar el raton
+    spraypix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
     jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
 
 

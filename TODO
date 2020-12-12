@@ -1,11 +1,12 @@
 Todo:
   Tools:
-    [] PEN
-    [] Spray
+    ✔ PEN @done(20-12-11 23:15)
+    ✔ Spray @started(20-12-11 23:47) @done(20-12-12 00:12) @lasted(25m9s)
     [] Square
-    [] Eraser @started(20-12-11 22:50)
-    [] Fix: Color stays white
-    [] Color picker after eraser
+    ✔ Eraser @started(20-12-11 22:50) @done(20-12-11 23:13) @lasted(23m47s)
+    ✔ Fix: Color stays white after eraser @done(20-12-11 23:13)
+    [] Maybe change shape
+    [] Color picker 
   ✔ Numeros con posicion X y Y @done(20-12-11 22:48)
   ✔ Choose colors @done(20-12-11 22:30) @lasted(2h51m16s)
   ✔ Exit Button @started(20-12-11 19:56) @done(20-12-11 22:47) @lasted(5min)
