@@ -111,7 +111,8 @@ eti2:
  dec ren
  cmp ren,-1 ;Se compara con -1 para llegar hasta el ultimo renglon, que es el CERO
  jne eti2 ;JNE=Jump if Not Equal (salta si no es igual)
- mov colo,03h
+ mov colo,04h
+ call curcolor
  
  jmp start ; jumps to drawing section
 ;***********************************************************************************************************************
@@ -217,7 +218,7 @@ eticolor0:
     cmp cx,8d
     jb eticolor1
     mov colo, 00h
-    ; actualcolor
+    call curcolor 
     jmp etip
 
 eticolor1:
@@ -230,7 +231,7 @@ eticolor1:
     cmp cx,38d
     jb eticolor2
     mov colo, 04h
-    ; actualcolor
+    call curcolor 
     jmp etip
 eticolor2:
     cmp dx,441d
@@ -242,7 +243,7 @@ eticolor2:
     cmp cx,68d
     jb eticolor3
     mov colo, 02h
-    ; actualcolor
+    call curcolor 
     jmp etip
 eticolor3:
     cmp dx,441d
@@ -254,7 +255,7 @@ eticolor3:
     cmp cx,98d
     jb eticolor4
     mov colo, 06h
-    ; actualcolor
+    call curcolor 
     jmp etip
 eticolor4:
     cmp dx,441d
@@ -266,7 +267,7 @@ eticolor4:
     cmp cx,128d
     jb eticolor5
     mov colo, 01h
-    ; actualcolor
+    call curcolor 
     jmp etip
 eticolor5:
     cmp dx,441d
@@ -278,6 +279,7 @@ eticolor5:
     cmp cx,158d
     jb eticolor6
     mov colo, 05h
+    call curcolor 
     jmp etip
 eticolor6:
     cmp dx,441d
@@ -289,6 +291,7 @@ eticolor6:
     cmp cx,188d
     jb eticolor7
     mov colo, 03h
+    call curcolor 
     jmp etip
 eticolor7:
     cmp dx,441d
@@ -300,6 +303,7 @@ eticolor7:
     cmp cx,218d
     jb eticolor8
     mov colo, 08h
+    call curcolor 
     jmp etip
 eticolor8:
     cmp dx,441d
@@ -311,6 +315,7 @@ eticolor8:
     cmp cx,248d
     jb eticolor9
     mov colo, 07h
+    call curcolor 
     jmp etip
 eticolor9:
     cmp dx,441d
@@ -322,6 +327,7 @@ eticolor9:
     cmp cx,278d
     jb eticolor10
     mov colo, 0Ch
+    call curcolor 
     jmp etip
 eticolor10:
     cmp dx,441d
@@ -333,6 +339,7 @@ eticolor10:
     cmp cx,308d
     jb eticolor11
     mov colo, 0ah
+    call curcolor 
     jmp etip
 eticolor11:
     cmp dx,441d
@@ -344,6 +351,7 @@ eticolor11:
     cmp cx,338d
     jb eticolor12
     mov colo, 0eh
+    call curcolor 
     jmp etip
 eticolor12:
     cmp dx,441d
@@ -355,6 +363,7 @@ eticolor12:
     cmp cx,368d
     jb eticolor13
     mov colo, 09h
+    call curcolor 
     jmp etip
 eticolor13:
     cmp dx,441d
@@ -366,6 +375,7 @@ eticolor13:
     cmp cx,398d
     jb eticolor14
     mov colo, 0dh
+    call curcolor 
     jmp etip
 eticolor14:
     cmp dx,441d
@@ -377,6 +387,7 @@ eticolor14:
     cmp cx,428d
     jb eticolor15
     mov colo, 0bh
+    call curcolor 
     jmp etip
 eticolor15:
     cmp dx,441d
@@ -388,6 +399,7 @@ eticolor15:
     cmp cx,458d
     jb etiexitbut
     mov colo, 0fh
+    call curcolor 
     jmp etip
 etiexitbut:
     cmp dx,428d
@@ -501,6 +513,11 @@ fin:
  int 20h ;Termina el programa
 
 ;------------------ Inicia Zona de Procedimientos ----------------------
+uptpos proc
+    mov col,cx
+    mov ren, dx
+    ret
+    uptpos endp
 brush proc ; Size is defined by cx value at start of procedure
     brush0:
     push cx
@@ -510,6 +527,24 @@ brush proc ; Size is defined by cx value at start of procedure
     loop brush0
     ret
     brush endp
+curcolor proc ; Size is defined by cx value at start of procedure
+    mov ren, 242d
+    mov cl, 28d
+    curcolor0:
+        mov ch, 28d
+        mov col, 105d
+        curcolorloop1:
+            push cx
+            ponpix col, ren
+            inc col
+            pop cx
+            dec ch
+            jnz curcolorloop1
+    dec ren
+    dec cl
+    jnz curcolor0
+    ret
+    curcolor endp
 cuadro proc
     mov col1,cx
     mov ren1,dx
