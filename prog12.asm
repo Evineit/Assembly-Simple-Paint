@@ -240,7 +240,7 @@ eti10:
     cmp bx,0d
     je etip ;Mientras NO se oprima ningun boton, se cicla
     cmp bx,1d
-    ; jne fin ;El programa termina si se oprime el boton derecho o los 2 botones
+    jne eti10 ;El programa termina si se oprime el boton derecho o los 2 botones
     
     ; Solo puede pintar en el cuadro blanco
     cmp cx,178d
@@ -535,6 +535,9 @@ fin:
 ;     mov afueras,0
 ;     ret
 cuadro proc
+    ; TODO: Draws the lines in all directions
+    ; TODO: Hide mouse after right click to print below it 
+    ; TODO: continuous right click doesnt creates lines like a brush 
     mov col1,cx
     mov ren1,dx
     cuad0:
@@ -559,37 +562,60 @@ cuadro proc
     mov ah,0ch
     mov al,colo
     int 10h ; Pone el primer pixel
+    cmp cx, col2
+    jae cuad1izq
     inc cx
+    jmp cuad1val
+    cuad1izq:
+    dec cx
+    cuad1val:
     cmp cx,col2
-    jbe cuad1 ;JBE=Jump if Below or Equal (Salta si esta abajo, o si es Igual)
+    jne cuad1 ;JBE=Jump if not Equal
     mov cx,col1
     mov dx,ren2
     cuad2: ;Inicia proceso para dibujar linea inferior horizontal
     mov ah,0ch
     mov al,colo
     int 10h
+    cmp cx, col2
+    jae cuad2izq
     inc cx
+    jmp cuad2val
+    cuad2izq:
+    dec cx
+    cuad2val:
     cmp cx,col2
-    jbe cuad2
+    jne cuad2
     mov cx,col1
     mov dx,ren1
     cuad3: ;Inicia proceso para dibujar linea izquierda vertical
     mov ah,0ch
     mov al,colo
     int 10h
+    cmp dx, ren2
+    jae cuad3up
     inc dx
+    jmp cuad3val
+    cuad3up:
+    dec dx
+    cuad3val:
     cmp dx,ren2
-    jbe cuad3
-
+    jne cuad3
     mov cx,col2
     mov dx,ren1
     cuad4: ;Inicia proceso para dibujar linea derecha vertical
     mov ah,0ch
     mov al,colo
     int 10h
+    cmp dx, ren2
+    jae cuad4up
     inc dx
+    jmp cuad4val
+    cuad4up:
+    dec dx
+    cuad4val:
     cmp dx,ren2
-    jbe cuad4
+    jne cuad4
     ret
     cuadro endp
 prende proc
