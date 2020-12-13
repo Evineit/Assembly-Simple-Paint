@@ -1,7 +1,6 @@
 UASM v2.49, Jun 21 2019, Masm-compatible assembler.
 
 prog12.asm
-                                ;Programa 12.- Programa que carga o despliega una imagen BMP pixel por pixel en pantalla (640x480)
 00000000                        CSEG    SEGMENT     ; code segment starts here.
                                     org 100h
 00000100  EB60                      jmp eti0
@@ -15,12 +14,14 @@ prog12.asm
                                 ; afueras db 0
 00000157  00                    buffer db ? ;DB=Define Byte, para almacenar valores entre 0 y 255, o sea 8 bits
 00000158  00                    colo db ? ; ? = Valor NO definido de inicio
+                                ; Cual herramienta se esta usando
 00000159  01                    tool db 1
-                                ; datos para cuadro
+                                ; Datos para cuadro
 0000015A  0000                  col1 dw ?
 0000015C  0000                  ren1 dw ?
 0000015E  0000                  col2 dw ?
 00000160  0000                  ren2 dw ?
+                                ; Macro para mostrar posicion de mouse
                                 numero macro num
  >                               mov ax,num
  >                               mov bl,100d
@@ -70,7 +71,7 @@ prog12.asm
 00000188  E2ED                   loop eti1
                                 ;*************************************************************************************************************************
 0000018A  B400                   mov ah,00h ;Funcion 00H para la INT 10H (Resolucion de Pantalla)
-0000018C  B012                   mov al,12h ;AL=Modo de despliegue o resolución, 18 = 640x480 a 16 colores
+0000018C  B012                   mov al,12h ;AL=Modo de despliegue o resolución, 12h = 640x480 a 16 colores
 0000018E  CD10                   int 10h ;INT 10H funcion 00H, inicializar resolucion
                                  ;***********************************************************************************************************************
 00000190                        eti2:
@@ -116,13 +117,6 @@ prog12.asm
 00000216  2EC606000003           mov colo,03h
                                  
 0000021C  EB0E                   jmp start ; jumps to drawing section
-                                 ;***********************************************************************************************************************
-                                ;  mov ah,07h
-                                ;  int 21h ;Espera que se oprima una tecla
-                                ;  mov ah,00h ;Funcion 00H para devolver al modo TEXTO
-                                ;  mov al,3d ;AL=Modo de despliegue o resolución, 3 = 80x25 a 16 colores (Modo TEXTO)
-                                ;  int 10h ;INT 10H funcion 00H, inicializar resolucion
-                                ;  int 20h ;Fin del Programa (Cuando se carga la imagen)
                                 ;***********************************************************************************************************************
 0000021E                        err: ;Se llega hasta aqui solo si hay error en la lectura del archivo
 0000021E  B409                   mov ah,09h
@@ -131,11 +125,12 @@ prog12.asm
 00000226  B407                   mov ah,07h
 00000228  CD21                   int 21h ;Espera a que se oprima tecla
 0000022A  CD20                   int 20h ;Fin del Programa (Cuando NO se carga la imagen)
+                                ;  Macros
                                 spraypix macro ren,col
- >                               mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
- >                               mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
- >                               mov cx,ren ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
- >                               mov dx,col ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
+ >                               mov ah,0Ch ;Funcion 0Ch para pintar o desplegar PIXEL
+ >                               mov al,colo ;AL=Atributos de color, parte baja
+ >                               mov cx,ren ;Cx=Columna donde se despliega PIXEL
+ >                               mov dx,col ;Dx=Renglon donde se despliega PIXEL
  >                               push cx
  >                               int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
  >                               add cx,2d
@@ -158,22 +153,22 @@ prog12.asm
  >                               endm
                                 ponpix macro co,re ;Macro que recibe dos parámetros, en C y en R
  >                               mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL ;Macro que recibe dos parámetros, en C y en R
- >                               mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color) ;Macro que recibe dos parámetros, en C y en R
+ >                               mov al,colo ;AL=Atributos de color, parte baja ;Macro que recibe dos parámetros, en C y en R
  >                               mov cx,co ;Cx=Columna donde se despliega PIXEL (empieza desde cero) ;Macro que recibe dos parámetros, en C y en R
  >                               mov dx,re ;Dx=Renglon donde se despliega PIXEL (empieza desde cero) ;Macro que recibe dos parámetros, en C y en R
  >                               int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon) ;Macro que recibe dos parámetros, en C y en R
- >                               inc cx ;Macro que recibe dos parámetros, en C y en R
- >                               int 10h ;Macro que recibe dos parámetros, en C y en R
- >                               inc cx ;Macro que recibe dos parámetros, en C y en R
- >                               int 10h ;Macro que recibe dos parámetros, en C y en R
- >                               inc cx ;Macro que recibe dos parámetros, en C y en R
- >                               int 10h ;Macro que recibe dos parámetros, en C y en R
- >                               inc cx ;Macro que recibe dos parámetros, en C y en R
- >                               int 10h ;Macro que recibe dos parámetros, en C y en R
+ >                              ;  inc cx ;Macro que recibe dos parámetros, en C y en R
+ >                              ;  int 10h ;Macro que recibe dos parámetros, en C y en R
+ >                              ;  inc cx ;Macro que recibe dos parámetros, en C y en R
+ >                              ;  int 10h ;Macro que recibe dos parámetros, en C y en R
+ >                              ;  inc cx ;Macro que recibe dos parámetros, en C y en R
+ >                              ;  int 10h ;Macro que recibe dos parámetros, en C y en R
+ >                              ;  inc cx ;Macro que recibe dos parámetros, en C y en R
+ >                              ;  int 10h ;Macro que recibe dos parámetros, en C y en R
  >                               endm ;Macro que recibe dos parámetros, en C y en R
                                 borpix macro ren, col
  >                                  mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
- >                                  mov al,0fh ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
+ >                                  mov al,0fh ;AL=Atributos de color, parte baja : Blanco como el panel de fondo
  >                                  mov cx,ren ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
  >                                  mov dx,col ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
  >                                  int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
@@ -185,53 +180,37 @@ prog12.asm
  >                                  int 10h
  >                                  inc cx
  >                                  int 10h
- >                                  endm   
-                                ;  TODO: Implement, bigger eraser
-                                actualcolor macro
- >                                  ponpix 21d,145d;Llama a la macro PONPIX para desplegar PIXEL
- >                                  ponpix 22d,145d;Llama a la macro PONPIX para desplegar PIXEL
- >                                  ponpix 23d,145d;Llama a la macro PONPIX para desplegar PIXEL
- >                                  ponpix 24d,145d;Llama a la macro PONPIX para desplegar PIXEL
- >                                  ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
- >                                  ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
- >                                  ponpix 26d,145d;Llama a la macro PONPIX para desplegar PIXEL
- >                                  ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
- >                                  ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
- >                                  ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
- >                                  ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
- >                                  ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
- >                                  ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
- >                                  ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
  >                                  endm
-                                ;  Falta idear como integrarlo
-                                ; dentro macro col1,col2,ren1,ren2
-                                ;     cmp cx,col1
-                                ;     jb etifuera ;JB=Jump if Below (Brinca si esta abajo)
-                                ;     cmp cx,col2
-                                ;     ja etifuera ;JA=Jmp if Above (Brinca si esta arriba)
-                                ;     cmp dx,ren1
-                                ;     ja etifuera
-                                ;     cmp dx,ren2
-                                ;     jb etifuera
-                                ;     jmp etidentro
-                                ;     etifuera:
-                                ;         inc afueras
-                                ;     etidentro:
-                                ;         endm
-
+                                ; actualcolor macro
+                                ;     ponpix 21d,145d;Llama a la macro PONPIX para desplegar PIXEL
+                                ;     ponpix 22d,145d;Llama a la macro PONPIX para desplegar PIXEL
+                                ;     ponpix 23d,145d;Llama a la macro PONPIX para desplegar PIXEL
+                                ;     ponpix 24d,145d;Llama a la macro PONPIX para desplegar PIXEL
+                                ;     ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
+                                ;     ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
+                                ;     ponpix 26d,145d;Llama a la macro PONPIX para desplegar PIXEL
+                                ;     ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
+                                ;     ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
+                                ;     ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
+                                ;     ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
+                                ;     ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
+                                ;     ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
+                                ;     ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
+                                ;     endm
                                     
                                 ;Inicio del Programa Principal
 0000022C                        start:
-                                ; call inigraf ;Llama al procedimiento para iniciar graficos
 0000022C                        etip:
-0000022C  E8560C                    call prende ;Llama al procedimiento para prender el raton
+0000022C  E84B05                    call prende ;Llama al procedimiento para prender el raton
                                     ; Muestra posicion en X y Y
+                                    ; Define en que posicion se mostrara
 0000022F  2E890E0000                mov col, cx
 00000234  2E89160000                mov ren, dx
 00000239  B402                      mov ah,02h
 0000023B  B200                      mov dl, 0d
 0000023D  B600                      mov dh, 0d
 0000023F  CD10                      int 10h
+                                    ; Los escribe en pantalla con un espacio de separacion
                                     numero col
 00000241  2EA10000           1   mov ax,col
 00000245  B364               1   mov bl,100d
@@ -289,7 +268,7 @@ prog12.asm
 000002AE  83FB00                    cmp bx,0d
 000002B1  7503E976FF                je etip ;Mientras NO se oprima ningun boton, se cicla
 000002B6  83FB01                    cmp bx,1d
-000002B9  75EE                      jne eti10 ;El programa termina si se oprime el boton derecho o los 2 botones
+000002B9  75EE                      jne eti10 ;El programa regresa a eti10 si no es boton izq
                                     
                                     ; Solo puede pintar en el cuadro blanco
 000002BB  81F9B200                  cmp cx,178d
@@ -300,1426 +279,480 @@ prog12.asm
 000002CB  7708                      ja eticolor0
 000002CD  83FA0F                    cmp dx,15d
 000002D0  7203                      jb eticolor0
-000002D2  E9010A                    jmp draw
+000002D2  E9C802                    jmp draw
 000002D5                        eticolor0:
 000002D5  81FAB901                  cmp dx,441d
-000002D9  7303E98E01                jb eticolor1 ;JB=Jump if Below (Brinca si esta abajo)
-000002DE  81FAD501                  cmp dx,469d
-000002E2  7603E98501                ja eticolor1 ;JA=Jmp if Above (Brinca si esta arriba)
-000002E7  83F924                    cmp cx,36d
-000002EA  7603E97D01                ja eticolor1
-000002EF  83F908                    cmp cx,8d
-000002F2  7303E97501                jb eticolor1
-000002F7  2EC606000000              mov colo, 00h
-                                    actualcolor
-                             1      ponpix 21d,145d;Llama a la macro PONPIX para desplegar PIXEL
-000002FD  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000002FF  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000303  B91500             2   mov cx,21d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000306  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000309  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-0000030B  41                 2   inc cx
-0000030C  CD10               2   int 10h
-0000030E  41                 2   inc cx
-0000030F  CD10               2   int 10h
-00000311  41                 2   inc cx
-00000312  CD10               2   int 10h
-00000314  41                 2   inc cx
-00000315  CD10               2   int 10h
-                             1      ponpix 22d,145d;Llama a la macro PONPIX para desplegar PIXEL
-00000317  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000319  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000031D  B91600             2   mov cx,22d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000320  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000323  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000325  41                 2   inc cx
-00000326  CD10               2   int 10h
-00000328  41                 2   inc cx
-00000329  CD10               2   int 10h
-0000032B  41                 2   inc cx
-0000032C  CD10               2   int 10h
-0000032E  41                 2   inc cx
-0000032F  CD10               2   int 10h
-                             1      ponpix 23d,145d;Llama a la macro PONPIX para desplegar PIXEL
-00000331  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000333  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000337  B91700             2   mov cx,23d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000033A  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-0000033D  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-0000033F  41                 2   inc cx
-00000340  CD10               2   int 10h
-00000342  41                 2   inc cx
-00000343  CD10               2   int 10h
-00000345  41                 2   inc cx
-00000346  CD10               2   int 10h
-00000348  41                 2   inc cx
-00000349  CD10               2   int 10h
-                             1      ponpix 24d,145d;Llama a la macro PONPIX para desplegar PIXEL
-0000034B  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-0000034D  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000351  B91800             2   mov cx,24d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000354  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000357  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000359  41                 2   inc cx
-0000035A  CD10               2   int 10h
-0000035C  41                 2   inc cx
-0000035D  CD10               2   int 10h
-0000035F  41                 2   inc cx
-00000360  CD10               2   int 10h
-00000362  41                 2   inc cx
-00000363  CD10               2   int 10h
-                             1      ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
-00000365  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000367  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000036B  B91900             2   mov cx,25d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000036E  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000371  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000373  41                 2   inc cx
-00000374  CD10               2   int 10h
-00000376  41                 2   inc cx
-00000377  CD10               2   int 10h
-00000379  41                 2   inc cx
-0000037A  CD10               2   int 10h
-0000037C  41                 2   inc cx
-0000037D  CD10               2   int 10h
-                             1      ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
-0000037F  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000381  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000385  B91900             2   mov cx,25d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000388  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-0000038B  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-0000038D  41                 2   inc cx
-0000038E  CD10               2   int 10h
-00000390  41                 2   inc cx
-00000391  CD10               2   int 10h
-00000393  41                 2   inc cx
-00000394  CD10               2   int 10h
-00000396  41                 2   inc cx
-00000397  CD10               2   int 10h
-                             1      ponpix 26d,145d;Llama a la macro PONPIX para desplegar PIXEL
-00000399  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-0000039B  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000039F  B91A00             2   mov cx,26d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000003A2  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000003A5  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000003A7  41                 2   inc cx
-000003A8  CD10               2   int 10h
-000003AA  41                 2   inc cx
-000003AB  CD10               2   int 10h
-000003AD  41                 2   inc cx
-000003AE  CD10               2   int 10h
-000003B0  41                 2   inc cx
-000003B1  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-000003B3  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000003B5  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000003B9  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000003BC  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000003BF  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000003C1  41                 2   inc cx
-000003C2  CD10               2   int 10h
-000003C4  41                 2   inc cx
-000003C5  CD10               2   int 10h
-000003C7  41                 2   inc cx
-000003C8  CD10               2   int 10h
-000003CA  41                 2   inc cx
-000003CB  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-000003CD  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000003CF  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000003D3  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000003D6  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000003D9  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000003DB  41                 2   inc cx
-000003DC  CD10               2   int 10h
-000003DE  41                 2   inc cx
-000003DF  CD10               2   int 10h
-000003E1  41                 2   inc cx
-000003E2  CD10               2   int 10h
-000003E4  41                 2   inc cx
-000003E5  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-000003E7  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000003E9  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000003ED  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000003F0  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000003F3  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000003F5  41                 2   inc cx
-000003F6  CD10               2   int 10h
-000003F8  41                 2   inc cx
-000003F9  CD10               2   int 10h
-000003FB  41                 2   inc cx
-000003FC  CD10               2   int 10h
-000003FE  41                 2   inc cx
-000003FF  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000401  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000403  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000407  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000040A  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-0000040D  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-0000040F  41                 2   inc cx
-00000410  CD10               2   int 10h
-00000412  41                 2   inc cx
-00000413  CD10               2   int 10h
-00000415  41                 2   inc cx
-00000416  CD10               2   int 10h
-00000418  41                 2   inc cx
-00000419  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-0000041B  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-0000041D  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000421  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000424  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000427  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000429  41                 2   inc cx
-0000042A  CD10               2   int 10h
-0000042C  41                 2   inc cx
-0000042D  CD10               2   int 10h
-0000042F  41                 2   inc cx
-00000430  CD10               2   int 10h
-00000432  41                 2   inc cx
-00000433  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000435  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000437  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000043B  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000043E  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000441  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000443  41                 2   inc cx
-00000444  CD10               2   int 10h
-00000446  41                 2   inc cx
-00000447  CD10               2   int 10h
-00000449  41                 2   inc cx
-0000044A  CD10               2   int 10h
-0000044C  41                 2   inc cx
-0000044D  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-0000044F  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000451  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000455  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000458  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-0000045B  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-0000045D  41                 2   inc cx
-0000045E  CD10               2   int 10h
-00000460  41                 2   inc cx
-00000461  CD10               2   int 10h
-00000463  41                 2   inc cx
-00000464  CD10               2   int 10h
-00000466  41                 2   inc cx
-00000467  CD10               2   int 10h
-00000469  E9C0FD                    jmp etip
+000002D9  7219                      jb eticolor1 ;JB=Jump if Below (Brinca si esta abajo)
+000002DB  81FAD501                  cmp dx,469d
+000002DF  7713                      ja eticolor1 ;JA=Jmp if Above (Brinca si esta arriba)
+000002E1  83F924                    cmp cx,36d
+000002E4  770E                      ja eticolor1
+000002E6  83F908                    cmp cx,8d
+000002E9  7209                      jb eticolor1
+000002EB  2EC606000000              mov colo, 00h
+                                    ; actualcolor
+000002F1  E938FF                    jmp etip
 
-0000046C                        eticolor1:
-0000046C  81FAB901                  cmp dx,441d
-00000470  7303E98E01                jb eticolor2 ;JB=Jump if Below (Brinca si esta abajo)
-00000475  81FAD501                  cmp dx,469d
-00000479  7603E98501                ja eticolor2 ;JA=Jmp if Above (Brinca si esta arriba)
-0000047E  83F942                    cmp cx,66d
-00000481  7603E97D01                ja eticolor2
-00000486  83F926                    cmp cx,38d
-00000489  7303E97501                jb eticolor2
-0000048E  2EC606000004              mov colo, 04h
-                                    actualcolor
-                             1      ponpix 21d,145d;Llama a la macro PONPIX para desplegar PIXEL
-00000494  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000496  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000049A  B91500             2   mov cx,21d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000049D  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000004A0  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000004A2  41                 2   inc cx
-000004A3  CD10               2   int 10h
-000004A5  41                 2   inc cx
-000004A6  CD10               2   int 10h
-000004A8  41                 2   inc cx
-000004A9  CD10               2   int 10h
-000004AB  41                 2   inc cx
-000004AC  CD10               2   int 10h
-                             1      ponpix 22d,145d;Llama a la macro PONPIX para desplegar PIXEL
-000004AE  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000004B0  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000004B4  B91600             2   mov cx,22d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000004B7  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000004BA  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000004BC  41                 2   inc cx
-000004BD  CD10               2   int 10h
-000004BF  41                 2   inc cx
-000004C0  CD10               2   int 10h
-000004C2  41                 2   inc cx
-000004C3  CD10               2   int 10h
-000004C5  41                 2   inc cx
-000004C6  CD10               2   int 10h
-                             1      ponpix 23d,145d;Llama a la macro PONPIX para desplegar PIXEL
-000004C8  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000004CA  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000004CE  B91700             2   mov cx,23d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000004D1  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000004D4  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000004D6  41                 2   inc cx
-000004D7  CD10               2   int 10h
-000004D9  41                 2   inc cx
-000004DA  CD10               2   int 10h
-000004DC  41                 2   inc cx
-000004DD  CD10               2   int 10h
-000004DF  41                 2   inc cx
-000004E0  CD10               2   int 10h
-                             1      ponpix 24d,145d;Llama a la macro PONPIX para desplegar PIXEL
-000004E2  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000004E4  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000004E8  B91800             2   mov cx,24d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000004EB  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000004EE  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000004F0  41                 2   inc cx
-000004F1  CD10               2   int 10h
-000004F3  41                 2   inc cx
-000004F4  CD10               2   int 10h
-000004F6  41                 2   inc cx
-000004F7  CD10               2   int 10h
-000004F9  41                 2   inc cx
-000004FA  CD10               2   int 10h
-                             1      ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
-000004FC  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000004FE  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000502  B91900             2   mov cx,25d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000505  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000508  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-0000050A  41                 2   inc cx
-0000050B  CD10               2   int 10h
-0000050D  41                 2   inc cx
-0000050E  CD10               2   int 10h
-00000510  41                 2   inc cx
-00000511  CD10               2   int 10h
-00000513  41                 2   inc cx
-00000514  CD10               2   int 10h
-                             1      ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
-00000516  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000518  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000051C  B91900             2   mov cx,25d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000051F  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000522  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000524  41                 2   inc cx
-00000525  CD10               2   int 10h
-00000527  41                 2   inc cx
-00000528  CD10               2   int 10h
-0000052A  41                 2   inc cx
-0000052B  CD10               2   int 10h
-0000052D  41                 2   inc cx
-0000052E  CD10               2   int 10h
-                             1      ponpix 26d,145d;Llama a la macro PONPIX para desplegar PIXEL
-00000530  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000532  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000536  B91A00             2   mov cx,26d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000539  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-0000053C  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-0000053E  41                 2   inc cx
-0000053F  CD10               2   int 10h
-00000541  41                 2   inc cx
-00000542  CD10               2   int 10h
-00000544  41                 2   inc cx
-00000545  CD10               2   int 10h
-00000547  41                 2   inc cx
-00000548  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-0000054A  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-0000054C  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000550  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000553  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000556  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000558  41                 2   inc cx
-00000559  CD10               2   int 10h
-0000055B  41                 2   inc cx
-0000055C  CD10               2   int 10h
-0000055E  41                 2   inc cx
-0000055F  CD10               2   int 10h
-00000561  41                 2   inc cx
-00000562  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000564  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000566  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000056A  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000056D  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000570  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000572  41                 2   inc cx
-00000573  CD10               2   int 10h
-00000575  41                 2   inc cx
-00000576  CD10               2   int 10h
-00000578  41                 2   inc cx
-00000579  CD10               2   int 10h
-0000057B  41                 2   inc cx
-0000057C  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-0000057E  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000580  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000584  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000587  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-0000058A  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-0000058C  41                 2   inc cx
-0000058D  CD10               2   int 10h
-0000058F  41                 2   inc cx
-00000590  CD10               2   int 10h
-00000592  41                 2   inc cx
-00000593  CD10               2   int 10h
-00000595  41                 2   inc cx
-00000596  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000598  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-0000059A  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000059E  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000005A1  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000005A4  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000005A6  41                 2   inc cx
-000005A7  CD10               2   int 10h
-000005A9  41                 2   inc cx
-000005AA  CD10               2   int 10h
-000005AC  41                 2   inc cx
-000005AD  CD10               2   int 10h
-000005AF  41                 2   inc cx
-000005B0  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-000005B2  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000005B4  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000005B8  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000005BB  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000005BE  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000005C0  41                 2   inc cx
-000005C1  CD10               2   int 10h
-000005C3  41                 2   inc cx
-000005C4  CD10               2   int 10h
-000005C6  41                 2   inc cx
-000005C7  CD10               2   int 10h
-000005C9  41                 2   inc cx
-000005CA  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-000005CC  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000005CE  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000005D2  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000005D5  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000005D8  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000005DA  41                 2   inc cx
-000005DB  CD10               2   int 10h
-000005DD  41                 2   inc cx
-000005DE  CD10               2   int 10h
-000005E0  41                 2   inc cx
-000005E1  CD10               2   int 10h
-000005E3  41                 2   inc cx
-000005E4  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-000005E6  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000005E8  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000005EC  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000005EF  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000005F2  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000005F4  41                 2   inc cx
-000005F5  CD10               2   int 10h
-000005F7  41                 2   inc cx
-000005F8  CD10               2   int 10h
-000005FA  41                 2   inc cx
-000005FB  CD10               2   int 10h
-000005FD  41                 2   inc cx
-000005FE  CD10               2   int 10h
-00000600  E929FC                    jmp etip
-00000603                        eticolor2:
-00000603  81FAB901                  cmp dx,441d
-00000607  7303E98E01                jb eticolor3 ;JB=Jump if Below (Brinca si esta abajo)
-0000060C  81FAD501                  cmp dx,469d
-00000610  7603E98501                ja eticolor3 ;JA=Jmp if Above (Brinca si esta arriba)
-00000615  83F960                    cmp cx,96d
-00000618  7603E97D01                ja eticolor3
-0000061D  83F944                    cmp cx,68d
-00000620  7303E97501                jb eticolor3
-00000625  2EC606000002              mov colo, 02h
-                                    actualcolor
-                             1      ponpix 21d,145d;Llama a la macro PONPIX para desplegar PIXEL
-0000062B  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-0000062D  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000631  B91500             2   mov cx,21d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000634  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000637  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000639  41                 2   inc cx
-0000063A  CD10               2   int 10h
-0000063C  41                 2   inc cx
-0000063D  CD10               2   int 10h
-0000063F  41                 2   inc cx
-00000640  CD10               2   int 10h
-00000642  41                 2   inc cx
-00000643  CD10               2   int 10h
-                             1      ponpix 22d,145d;Llama a la macro PONPIX para desplegar PIXEL
-00000645  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000647  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000064B  B91600             2   mov cx,22d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000064E  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000651  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000653  41                 2   inc cx
-00000654  CD10               2   int 10h
-00000656  41                 2   inc cx
-00000657  CD10               2   int 10h
-00000659  41                 2   inc cx
-0000065A  CD10               2   int 10h
-0000065C  41                 2   inc cx
-0000065D  CD10               2   int 10h
-                             1      ponpix 23d,145d;Llama a la macro PONPIX para desplegar PIXEL
-0000065F  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000661  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000665  B91700             2   mov cx,23d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000668  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-0000066B  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-0000066D  41                 2   inc cx
-0000066E  CD10               2   int 10h
-00000670  41                 2   inc cx
-00000671  CD10               2   int 10h
-00000673  41                 2   inc cx
-00000674  CD10               2   int 10h
-00000676  41                 2   inc cx
-00000677  CD10               2   int 10h
-                             1      ponpix 24d,145d;Llama a la macro PONPIX para desplegar PIXEL
-00000679  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-0000067B  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000067F  B91800             2   mov cx,24d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000682  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000685  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000687  41                 2   inc cx
-00000688  CD10               2   int 10h
-0000068A  41                 2   inc cx
-0000068B  CD10               2   int 10h
-0000068D  41                 2   inc cx
-0000068E  CD10               2   int 10h
-00000690  41                 2   inc cx
-00000691  CD10               2   int 10h
-                             1      ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
-00000693  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000695  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000699  B91900             2   mov cx,25d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000069C  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-0000069F  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000006A1  41                 2   inc cx
-000006A2  CD10               2   int 10h
-000006A4  41                 2   inc cx
-000006A5  CD10               2   int 10h
-000006A7  41                 2   inc cx
-000006A8  CD10               2   int 10h
-000006AA  41                 2   inc cx
-000006AB  CD10               2   int 10h
-                             1      ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
-000006AD  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000006AF  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000006B3  B91900             2   mov cx,25d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000006B6  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000006B9  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000006BB  41                 2   inc cx
-000006BC  CD10               2   int 10h
-000006BE  41                 2   inc cx
-000006BF  CD10               2   int 10h
-000006C1  41                 2   inc cx
-000006C2  CD10               2   int 10h
-000006C4  41                 2   inc cx
-000006C5  CD10               2   int 10h
-                             1      ponpix 26d,145d;Llama a la macro PONPIX para desplegar PIXEL
-000006C7  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000006C9  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000006CD  B91A00             2   mov cx,26d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000006D0  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000006D3  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000006D5  41                 2   inc cx
-000006D6  CD10               2   int 10h
-000006D8  41                 2   inc cx
-000006D9  CD10               2   int 10h
-000006DB  41                 2   inc cx
-000006DC  CD10               2   int 10h
-000006DE  41                 2   inc cx
-000006DF  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-000006E1  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000006E3  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000006E7  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000006EA  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000006ED  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000006EF  41                 2   inc cx
-000006F0  CD10               2   int 10h
-000006F2  41                 2   inc cx
-000006F3  CD10               2   int 10h
-000006F5  41                 2   inc cx
-000006F6  CD10               2   int 10h
-000006F8  41                 2   inc cx
-000006F9  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-000006FB  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000006FD  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000701  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000704  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000707  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000709  41                 2   inc cx
-0000070A  CD10               2   int 10h
-0000070C  41                 2   inc cx
-0000070D  CD10               2   int 10h
-0000070F  41                 2   inc cx
-00000710  CD10               2   int 10h
-00000712  41                 2   inc cx
-00000713  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000715  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000717  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000071B  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000071E  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000721  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000723  41                 2   inc cx
-00000724  CD10               2   int 10h
-00000726  41                 2   inc cx
-00000727  CD10               2   int 10h
-00000729  41                 2   inc cx
-0000072A  CD10               2   int 10h
-0000072C  41                 2   inc cx
-0000072D  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-0000072F  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000731  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000735  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000738  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-0000073B  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-0000073D  41                 2   inc cx
-0000073E  CD10               2   int 10h
-00000740  41                 2   inc cx
-00000741  CD10               2   int 10h
-00000743  41                 2   inc cx
-00000744  CD10               2   int 10h
-00000746  41                 2   inc cx
-00000747  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000749  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-0000074B  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000074F  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000752  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000755  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000757  41                 2   inc cx
-00000758  CD10               2   int 10h
-0000075A  41                 2   inc cx
-0000075B  CD10               2   int 10h
-0000075D  41                 2   inc cx
-0000075E  CD10               2   int 10h
-00000760  41                 2   inc cx
-00000761  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000763  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000765  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000769  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000076C  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-0000076F  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000771  41                 2   inc cx
-00000772  CD10               2   int 10h
-00000774  41                 2   inc cx
-00000775  CD10               2   int 10h
-00000777  41                 2   inc cx
-00000778  CD10               2   int 10h
-0000077A  41                 2   inc cx
-0000077B  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-0000077D  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-0000077F  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000783  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000786  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000789  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-0000078B  41                 2   inc cx
-0000078C  CD10               2   int 10h
-0000078E  41                 2   inc cx
-0000078F  CD10               2   int 10h
-00000791  41                 2   inc cx
-00000792  CD10               2   int 10h
-00000794  41                 2   inc cx
-00000795  CD10               2   int 10h
-00000797  E992FA                    jmp etip
-0000079A                        eticolor3:
-0000079A  81FAB901                  cmp dx,441d
-0000079E  7303E98E01                jb eticolor4 ;JB=Jump if Below (Brinca si esta abajo)
-000007A3  81FAD501                  cmp dx,469d
-000007A7  7603E98501                ja eticolor4 ;JA=Jmp if Above (Brinca si esta arriba)
-000007AC  83F97E                    cmp cx,126d
-000007AF  7603E97D01                ja eticolor4
-000007B4  83F962                    cmp cx,98d
-000007B7  7303E97501                jb eticolor4
-000007BC  2EC606000006              mov colo, 06h
-                                    actualcolor
-                             1      ponpix 21d,145d;Llama a la macro PONPIX para desplegar PIXEL
-000007C2  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000007C4  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000007C8  B91500             2   mov cx,21d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000007CB  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000007CE  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000007D0  41                 2   inc cx
-000007D1  CD10               2   int 10h
-000007D3  41                 2   inc cx
-000007D4  CD10               2   int 10h
-000007D6  41                 2   inc cx
-000007D7  CD10               2   int 10h
-000007D9  41                 2   inc cx
-000007DA  CD10               2   int 10h
-                             1      ponpix 22d,145d;Llama a la macro PONPIX para desplegar PIXEL
-000007DC  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000007DE  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000007E2  B91600             2   mov cx,22d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000007E5  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000007E8  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000007EA  41                 2   inc cx
-000007EB  CD10               2   int 10h
-000007ED  41                 2   inc cx
-000007EE  CD10               2   int 10h
-000007F0  41                 2   inc cx
-000007F1  CD10               2   int 10h
-000007F3  41                 2   inc cx
-000007F4  CD10               2   int 10h
-                             1      ponpix 23d,145d;Llama a la macro PONPIX para desplegar PIXEL
-000007F6  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000007F8  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000007FC  B91700             2   mov cx,23d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000007FF  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000802  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000804  41                 2   inc cx
-00000805  CD10               2   int 10h
-00000807  41                 2   inc cx
-00000808  CD10               2   int 10h
-0000080A  41                 2   inc cx
-0000080B  CD10               2   int 10h
-0000080D  41                 2   inc cx
-0000080E  CD10               2   int 10h
-                             1      ponpix 24d,145d;Llama a la macro PONPIX para desplegar PIXEL
-00000810  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000812  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000816  B91800             2   mov cx,24d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000819  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-0000081C  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-0000081E  41                 2   inc cx
-0000081F  CD10               2   int 10h
-00000821  41                 2   inc cx
-00000822  CD10               2   int 10h
-00000824  41                 2   inc cx
-00000825  CD10               2   int 10h
-00000827  41                 2   inc cx
-00000828  CD10               2   int 10h
-                             1      ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
-0000082A  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-0000082C  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000830  B91900             2   mov cx,25d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000833  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000836  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000838  41                 2   inc cx
-00000839  CD10               2   int 10h
-0000083B  41                 2   inc cx
-0000083C  CD10               2   int 10h
-0000083E  41                 2   inc cx
-0000083F  CD10               2   int 10h
-00000841  41                 2   inc cx
-00000842  CD10               2   int 10h
-                             1      ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
-00000844  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000846  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000084A  B91900             2   mov cx,25d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000084D  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000850  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000852  41                 2   inc cx
-00000853  CD10               2   int 10h
-00000855  41                 2   inc cx
-00000856  CD10               2   int 10h
-00000858  41                 2   inc cx
-00000859  CD10               2   int 10h
-0000085B  41                 2   inc cx
-0000085C  CD10               2   int 10h
-                             1      ponpix 26d,145d;Llama a la macro PONPIX para desplegar PIXEL
-0000085E  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000860  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000864  B91A00             2   mov cx,26d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000867  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-0000086A  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-0000086C  41                 2   inc cx
-0000086D  CD10               2   int 10h
-0000086F  41                 2   inc cx
-00000870  CD10               2   int 10h
-00000872  41                 2   inc cx
-00000873  CD10               2   int 10h
-00000875  41                 2   inc cx
-00000876  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000878  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-0000087A  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000087E  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000881  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000884  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000886  41                 2   inc cx
-00000887  CD10               2   int 10h
-00000889  41                 2   inc cx
-0000088A  CD10               2   int 10h
-0000088C  41                 2   inc cx
-0000088D  CD10               2   int 10h
-0000088F  41                 2   inc cx
-00000890  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000892  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000894  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000898  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000089B  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-0000089E  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000008A0  41                 2   inc cx
-000008A1  CD10               2   int 10h
-000008A3  41                 2   inc cx
-000008A4  CD10               2   int 10h
-000008A6  41                 2   inc cx
-000008A7  CD10               2   int 10h
-000008A9  41                 2   inc cx
-000008AA  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-000008AC  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000008AE  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000008B2  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000008B5  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000008B8  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000008BA  41                 2   inc cx
-000008BB  CD10               2   int 10h
-000008BD  41                 2   inc cx
-000008BE  CD10               2   int 10h
-000008C0  41                 2   inc cx
-000008C1  CD10               2   int 10h
-000008C3  41                 2   inc cx
-000008C4  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-000008C6  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000008C8  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000008CC  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000008CF  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000008D2  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000008D4  41                 2   inc cx
-000008D5  CD10               2   int 10h
-000008D7  41                 2   inc cx
-000008D8  CD10               2   int 10h
-000008DA  41                 2   inc cx
-000008DB  CD10               2   int 10h
-000008DD  41                 2   inc cx
-000008DE  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-000008E0  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000008E2  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000008E6  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000008E9  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000008EC  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000008EE  41                 2   inc cx
-000008EF  CD10               2   int 10h
-000008F1  41                 2   inc cx
-000008F2  CD10               2   int 10h
-000008F4  41                 2   inc cx
-000008F5  CD10               2   int 10h
-000008F7  41                 2   inc cx
-000008F8  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-000008FA  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000008FC  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000900  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000903  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000906  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000908  41                 2   inc cx
-00000909  CD10               2   int 10h
-0000090B  41                 2   inc cx
-0000090C  CD10               2   int 10h
-0000090E  41                 2   inc cx
-0000090F  CD10               2   int 10h
-00000911  41                 2   inc cx
-00000912  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000914  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000916  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000091A  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000091D  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000920  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000922  41                 2   inc cx
-00000923  CD10               2   int 10h
-00000925  41                 2   inc cx
-00000926  CD10               2   int 10h
-00000928  41                 2   inc cx
-00000929  CD10               2   int 10h
-0000092B  41                 2   inc cx
-0000092C  CD10               2   int 10h
-0000092E  E9FBF8                    jmp etip
-00000931                        eticolor4:
-00000931  81FAB901                  cmp dx,441d
-00000935  7303E99001                jb eticolor5 ;JB=Jump if Below (Brinca si esta abajo)
-0000093A  81FAD501                  cmp dx,469d
-0000093E  7603E98701                ja eticolor5 ;JA=Jmp if Above (Brinca si esta arriba)
-00000943  81F99C00                  cmp cx,156d
-00000947  7603E97E01                ja eticolor5
-0000094C  81F98000                  cmp cx,128d
-00000950  7303E97501                jb eticolor5
-00000955  2EC606000001              mov colo, 01h
-                                    actualcolor
-                             1      ponpix 21d,145d;Llama a la macro PONPIX para desplegar PIXEL
-0000095B  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-0000095D  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000961  B91500             2   mov cx,21d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000964  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000967  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000969  41                 2   inc cx
-0000096A  CD10               2   int 10h
-0000096C  41                 2   inc cx
-0000096D  CD10               2   int 10h
-0000096F  41                 2   inc cx
-00000970  CD10               2   int 10h
-00000972  41                 2   inc cx
-00000973  CD10               2   int 10h
-                             1      ponpix 22d,145d;Llama a la macro PONPIX para desplegar PIXEL
-00000975  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000977  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-0000097B  B91600             2   mov cx,22d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-0000097E  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000981  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000983  41                 2   inc cx
-00000984  CD10               2   int 10h
-00000986  41                 2   inc cx
-00000987  CD10               2   int 10h
-00000989  41                 2   inc cx
-0000098A  CD10               2   int 10h
-0000098C  41                 2   inc cx
-0000098D  CD10               2   int 10h
-                             1      ponpix 23d,145d;Llama a la macro PONPIX para desplegar PIXEL
-0000098F  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000991  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000995  B91700             2   mov cx,23d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000998  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-0000099B  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-0000099D  41                 2   inc cx
-0000099E  CD10               2   int 10h
-000009A0  41                 2   inc cx
-000009A1  CD10               2   int 10h
-000009A3  41                 2   inc cx
-000009A4  CD10               2   int 10h
-000009A6  41                 2   inc cx
-000009A7  CD10               2   int 10h
-                             1      ponpix 24d,145d;Llama a la macro PONPIX para desplegar PIXEL
-000009A9  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000009AB  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000009AF  B91800             2   mov cx,24d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000009B2  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000009B5  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000009B7  41                 2   inc cx
-000009B8  CD10               2   int 10h
-000009BA  41                 2   inc cx
-000009BB  CD10               2   int 10h
-000009BD  41                 2   inc cx
-000009BE  CD10               2   int 10h
-000009C0  41                 2   inc cx
-000009C1  CD10               2   int 10h
-                             1      ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
-000009C3  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000009C5  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000009C9  B91900             2   mov cx,25d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000009CC  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000009CF  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000009D1  41                 2   inc cx
-000009D2  CD10               2   int 10h
-000009D4  41                 2   inc cx
-000009D5  CD10               2   int 10h
-000009D7  41                 2   inc cx
-000009D8  CD10               2   int 10h
-000009DA  41                 2   inc cx
-000009DB  CD10               2   int 10h
-                             1      ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
-000009DD  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000009DF  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000009E3  B91900             2   mov cx,25d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-000009E6  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-000009E9  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-000009EB  41                 2   inc cx
-000009EC  CD10               2   int 10h
-000009EE  41                 2   inc cx
-000009EF  CD10               2   int 10h
-000009F1  41                 2   inc cx
-000009F2  CD10               2   int 10h
-000009F4  41                 2   inc cx
-000009F5  CD10               2   int 10h
-                             1      ponpix 26d,145d;Llama a la macro PONPIX para desplegar PIXEL
-000009F7  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-000009F9  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-000009FD  B91A00             2   mov cx,26d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000A00  BA9100             2   mov dx,145d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000A03  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000A05  41                 2   inc cx
-00000A06  CD10               2   int 10h
-00000A08  41                 2   inc cx
-00000A09  CD10               2   int 10h
-00000A0B  41                 2   inc cx
-00000A0C  CD10               2   int 10h
-00000A0E  41                 2   inc cx
-00000A0F  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000A11  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000A13  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000A17  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000A1A  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000A1D  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000A1F  41                 2   inc cx
-00000A20  CD10               2   int 10h
-00000A22  41                 2   inc cx
-00000A23  CD10               2   int 10h
-00000A25  41                 2   inc cx
-00000A26  CD10               2   int 10h
-00000A28  41                 2   inc cx
-00000A29  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000A2B  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000A2D  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000A31  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000A34  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000A37  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000A39  41                 2   inc cx
-00000A3A  CD10               2   int 10h
-00000A3C  41                 2   inc cx
-00000A3D  CD10               2   int 10h
-00000A3F  41                 2   inc cx
-00000A40  CD10               2   int 10h
-00000A42  41                 2   inc cx
-00000A43  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000A45  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000A47  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000A4B  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000A4E  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000A51  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000A53  41                 2   inc cx
-00000A54  CD10               2   int 10h
-00000A56  41                 2   inc cx
-00000A57  CD10               2   int 10h
-00000A59  41                 2   inc cx
-00000A5A  CD10               2   int 10h
-00000A5C  41                 2   inc cx
-00000A5D  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000A5F  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000A61  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000A65  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000A68  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000A6B  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000A6D  41                 2   inc cx
-00000A6E  CD10               2   int 10h
-00000A70  41                 2   inc cx
-00000A71  CD10               2   int 10h
-00000A73  41                 2   inc cx
-00000A74  CD10               2   int 10h
-00000A76  41                 2   inc cx
-00000A77  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000A79  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000A7B  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000A7F  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000A82  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000A85  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000A87  41                 2   inc cx
-00000A88  CD10               2   int 10h
-00000A8A  41                 2   inc cx
-00000A8B  CD10               2   int 10h
-00000A8D  41                 2   inc cx
-00000A8E  CD10               2   int 10h
-00000A90  41                 2   inc cx
-00000A91  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000A93  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000A95  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000A99  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000A9C  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000A9F  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000AA1  41                 2   inc cx
-00000AA2  CD10               2   int 10h
-00000AA4  41                 2   inc cx
-00000AA5  CD10               2   int 10h
-00000AA7  41                 2   inc cx
-00000AA8  CD10               2   int 10h
-00000AAA  41                 2   inc cx
-00000AAB  CD10               2   int 10h
-                             1      ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-00000AAD  B40C               2   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000AAF  2EA00000           2   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000AB3  B91B00             2   mov cx,27d ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000AB6  BA9200             2   mov dx,146d ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000AB9  CD10               2   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000ABB  41                 2   inc cx
-00000ABC  CD10               2   int 10h
-00000ABE  41                 2   inc cx
-00000ABF  CD10               2   int 10h
-00000AC1  41                 2   inc cx
-00000AC2  CD10               2   int 10h
-00000AC4  41                 2   inc cx
-00000AC5  CD10               2   int 10h
-00000AC7  E962F7                    jmp etip
-00000ACA                        eticolor5:
-00000ACA  81FAB901                  cmp dx,441d
-00000ACE  721B                      jb eticolor6 ;JB=Jump if Below (Brinca si esta abajo)
-00000AD0  81FAD501                  cmp dx,469d
-00000AD4  7715                      ja eticolor6 ;JA=Jmp if Above (Brinca si esta arriba)
-00000AD6  81F9BA00                  cmp cx,186d
-00000ADA  770F                      ja eticolor6
-00000ADC  81F99E00                  cmp cx,158d
-00000AE0  7209                      jb eticolor6
-00000AE2  2EC606000005              mov colo, 05h
-00000AE8  E941F7                    jmp etip
-00000AEB                        eticolor6:
-00000AEB  81FAB901                  cmp dx,441d
-00000AEF  721B                      jb eticolor7 ;JB=Jump if Below (Brinca si esta abajo)
-00000AF1  81FAD501                  cmp dx,469d
-00000AF5  7715                      ja eticolor7 ;JA=Jmp if Above (Brinca si esta arriba)
-00000AF7  81F9D800                  cmp cx,216d
-00000AFB  770F                      ja eticolor7
-00000AFD  81F9BC00                  cmp cx,188d
-00000B01  7209                      jb eticolor7
-00000B03  2EC606000003              mov colo, 03h
-00000B09  E920F7                    jmp etip
-00000B0C                        eticolor7:
-00000B0C  81FAB901                  cmp dx,441d
-00000B10  721B                      jb eticolor8 ;JB=Jump if Below (Brinca si esta abajo)
-00000B12  81FAD501                  cmp dx,469d
-00000B16  7715                      ja eticolor8 ;JA=Jmp if Above (Brinca si esta arriba)
-00000B18  81F9F600                  cmp cx,246d
-00000B1C  770F                      ja eticolor8
-00000B1E  81F9DA00                  cmp cx,218d
-00000B22  7209                      jb eticolor8
-00000B24  2EC606000008              mov colo, 08h
-00000B2A  E9FFF6                    jmp etip
-00000B2D                        eticolor8:
-00000B2D  81FAB901                  cmp dx,441d
-00000B31  721B                      jb eticolor9 ;JB=Jump if Below (Brinca si esta abajo)
-00000B33  81FAD501                  cmp dx,469d
-00000B37  7715                      ja eticolor9 ;JA=Jmp if Above (Brinca si esta arriba)
-00000B39  81F91401                  cmp cx,276d
-00000B3D  770F                      ja eticolor9
-00000B3F  81F9F800                  cmp cx,248d
-00000B43  7209                      jb eticolor9
-00000B45  2EC606000007              mov colo, 07h
-00000B4B  E9DEF6                    jmp etip
-00000B4E                        eticolor9:
-00000B4E  81FAB901                  cmp dx,441d
-00000B52  721B                      jb eticolor10 ;JB=Jump if Below (Brinca si esta abajo)
-00000B54  81FAD501                  cmp dx,469d
-00000B58  7715                      ja eticolor10 ;JA=Jmp if Above (Brinca si esta arriba)
-00000B5A  81F93201                  cmp cx,306d
-00000B5E  770F                      ja eticolor10
-00000B60  81F91601                  cmp cx,278d
-00000B64  7209                      jb eticolor10
-00000B66  2EC60600000C              mov colo, 0Ch
-00000B6C  E9BDF6                    jmp etip
-00000B6F                        eticolor10:
-00000B6F  81FAB901                  cmp dx,441d
-00000B73  721B                      jb eticolor11 ;JB=Jump if Below (Brinca si esta abajo)
-00000B75  81FAD501                  cmp dx,469d
-00000B79  7715                      ja eticolor11 ;JA=Jmp if Above (Brinca si esta arriba)
-00000B7B  81F95001                  cmp cx,336d
-00000B7F  770F                      ja eticolor11
-00000B81  81F93401                  cmp cx,308d
-00000B85  7209                      jb eticolor11
-00000B87  2EC60600000A              mov colo, 0ah
-00000B8D  E99CF6                    jmp etip
-00000B90                        eticolor11:
-00000B90  81FAB901                  cmp dx,441d
-00000B94  721B                      jb eticolor12 ;JB=Jump if Below (Brinca si esta abajo)
-00000B96  81FAD501                  cmp dx,469d
-00000B9A  7715                      ja eticolor12 ;JA=Jmp if Above (Brinca si esta arriba)
-00000B9C  81F96E01                  cmp cx,366d
-00000BA0  770F                      ja eticolor12
-00000BA2  81F95201                  cmp cx,338d
-00000BA6  7209                      jb eticolor12
-00000BA8  2EC60600000E              mov colo, 0eh
-00000BAE  E97BF6                    jmp etip
-00000BB1                        eticolor12:
-00000BB1  81FAB901                  cmp dx,441d
-00000BB5  721B                      jb eticolor13 ;JB=Jump if Below (Brinca si esta abajo)
-00000BB7  81FAD501                  cmp dx,469d
-00000BBB  7715                      ja eticolor13 ;JA=Jmp if Above (Brinca si esta arriba)
-00000BBD  81F98C01                  cmp cx,396d
-00000BC1  770F                      ja eticolor13
-00000BC3  81F97001                  cmp cx,368d
-00000BC7  7209                      jb eticolor13
-00000BC9  2EC606000009              mov colo, 09h
-00000BCF  E95AF6                    jmp etip
-00000BD2                        eticolor13:
-00000BD2  81FAB901                  cmp dx,441d
-00000BD6  721B                      jb eticolor14 ;JB=Jump if Below (Brinca si esta abajo)
-00000BD8  81FAD501                  cmp dx,469d
-00000BDC  7715                      ja eticolor14 ;JA=Jmp if Above (Brinca si esta arriba)
-00000BDE  81F9AA01                  cmp cx,426d
-00000BE2  770F                      ja eticolor14
-00000BE4  81F98E01                  cmp cx,398d
-00000BE8  7209                      jb eticolor14
-00000BEA  2EC60600000D              mov colo, 0dh
-00000BF0  E939F6                    jmp etip
-00000BF3                        eticolor14:
-00000BF3  81FAB901                  cmp dx,441d
-00000BF7  721B                      jb eticolor15 ;JB=Jump if Below (Brinca si esta abajo)
-00000BF9  81FAD501                  cmp dx,469d
-00000BFD  7715                      ja eticolor15 ;JA=Jmp if Above (Brinca si esta arriba)
-00000BFF  81F9C801                  cmp cx,456d
-00000C03  770F                      ja eticolor15
-00000C05  81F9AC01                  cmp cx,428d
-00000C09  7209                      jb eticolor15
-00000C0B  2EC60600000B              mov colo, 0bh
-00000C11  E918F6                    jmp etip
-00000C14                        eticolor15:
-00000C14  81FAB901                  cmp dx,441d
-00000C18  721B                      jb etiexitbut ;JB=Jump if Below (Brinca si esta abajo)
-00000C1A  81FAD501                  cmp dx,469d
-00000C1E  7715                      ja etiexitbut ;JA=Jmp if Above (Brinca si esta arriba)
-00000C20  81F9E601                  cmp cx,486d
-00000C24  770F                      ja etiexitbut
-00000C26  81F9CA01                  cmp cx,458d
-00000C2A  7209                      jb etiexitbut
-00000C2C  2EC60600000F              mov colo, 0fh
-00000C32  E9F7F5                    jmp etip
-00000C35                        etiexitbut:
-00000C35  81FAAC01                  cmp dx,428d
-00000C39  7215                      jb etitool1 ;JB=Jump if Below (Brinca si esta abajo)
-00000C3B  81FAD601                  cmp dx,470d
-00000C3F  770F                      ja etitool1 ;JA=Jmp if Above (Brinca si esta arriba)
-00000C41  81F96C02                  cmp cx,620d
-00000C45  7709                      ja etitool1
-00000C47  81F94202                  cmp cx,578d
-00000C4B  7203                      jb etitool1
-00000C4D  E95501                    jmp fin
-00000C50                        etitool1:
-00000C50  83FA4D                    cmp dx,77d
-00000C53  7218                      jb etitool2 ;JB=Jump if Below (Brinca si esta abajo)
-00000C55  83FA7D                    cmp dx,125d
-00000C58  7713                      ja etitool2 ;JA=Jmp if Above (Brinca si esta arriba)
-00000C5A  83F913                    cmp cx,19d
-00000C5D  720E                      jb etitool2
-00000C5F  83F943                    cmp cx,67d
-00000C62  7709                      ja etitool2
-00000C64  2EC606000001              mov tool,1d
-00000C6A  E93CF6                    jmp eti10
-00000C6D                        etitool2:
-00000C6D  83FA4D                    cmp dx,77d
-00000C70  7219                      jb etitool3 ;JB=Jump if Below (Brinca si esta abajo)
-00000C72  83FA7D                    cmp dx,125d
-00000C75  7714                      ja etitool3 ;JA=Jmp if Above (Brinca si esta arriba)
-00000C77  83F961                    cmp cx,97d
-00000C7A  720F                      jb etitool3
-00000C7C  81F99100                  cmp cx,145d
-00000C80  7709                      ja etitool3
-00000C82  2EC606000002              mov tool,2d
-00000C88  E91EF6                    jmp eti10
-00000C8B                        etitool3:
-00000C8B  81FA8F00                  cmp dx,143d
-00000C8F  7219                      jb etitool4 ;JB=Jump if Below (Brinca si esta abajo)
-00000C91  81FAC000                  cmp dx,192d
-00000C95  7713                      ja etitool4 ;JA=Jmp if Above (Brinca si esta arriba)
-00000C97  83F913                    cmp cx,19d
-00000C9A  720E                      jb etitool4
-00000C9C  83F943                    cmp cx,67d
-00000C9F  7709                      ja etitool4
-00000CA1  2EC606000003              mov tool,3d
-00000CA7  E9FFF5                    jmp eti10
-00000CAA                        etitool4:
-00000CAA  81FA8D00                  cmp dx,141d
-00000CAE  7303E9F6F5                jb eti10 ;JB=Jump if Below (Brinca si esta abajo)
-00000CB3  81FABD00                  cmp dx,189d
-00000CB7  7603E9EDF5                ja eti10 ;JA=Jmp if Above (Brinca si esta arriba)
-00000CBC  83F961                    cmp cx,97d
-00000CBF  7303E9E5F5                jb eti10
-00000CC4  81F99100                  cmp cx,145d
-00000CC8  7603E9DCF5                ja eti10
-00000CCD  2EC606000004              mov tool,4d
-00000CD3  E9D3F5                    jmp eti10
+000002F4                        eticolor1:
+000002F4  81FAB901                  cmp dx,441d
+000002F8  7219                      jb eticolor2 ;JB=Jump if Below (Brinca si esta abajo)
+000002FA  81FAD501                  cmp dx,469d
+000002FE  7713                      ja eticolor2 ;JA=Jmp if Above (Brinca si esta arriba)
+00000300  83F942                    cmp cx,66d
+00000303  770E                      ja eticolor2
+00000305  83F926                    cmp cx,38d
+00000308  7209                      jb eticolor2
+0000030A  2EC606000004              mov colo, 04h
+                                    ; actualcolor
+00000310  E919FF                    jmp etip
+00000313                        eticolor2:
+00000313  81FAB901                  cmp dx,441d
+00000317  7219                      jb eticolor3 ;JB=Jump if Below (Brinca si esta abajo)
+00000319  81FAD501                  cmp dx,469d
+0000031D  7713                      ja eticolor3 ;JA=Jmp if Above (Brinca si esta arriba)
+0000031F  83F960                    cmp cx,96d
+00000322  770E                      ja eticolor3
+00000324  83F944                    cmp cx,68d
+00000327  7209                      jb eticolor3
+00000329  2EC606000002              mov colo, 02h
+                                    ; actualcolor
+0000032F  E9FAFE                    jmp etip
+00000332                        eticolor3:
+00000332  81FAB901                  cmp dx,441d
+00000336  7219                      jb eticolor4 ;JB=Jump if Below (Brinca si esta abajo)
+00000338  81FAD501                  cmp dx,469d
+0000033C  7713                      ja eticolor4 ;JA=Jmp if Above (Brinca si esta arriba)
+0000033E  83F97E                    cmp cx,126d
+00000341  770E                      ja eticolor4
+00000343  83F962                    cmp cx,98d
+00000346  7209                      jb eticolor4
+00000348  2EC606000006              mov colo, 06h
+                                    ; actualcolor
+0000034E  E9DBFE                    jmp etip
+00000351                        eticolor4:
+00000351  81FAB901                  cmp dx,441d
+00000355  721B                      jb eticolor5 ;JB=Jump if Below (Brinca si esta abajo)
+00000357  81FAD501                  cmp dx,469d
+0000035B  7715                      ja eticolor5 ;JA=Jmp if Above (Brinca si esta arriba)
+0000035D  81F99C00                  cmp cx,156d
+00000361  770F                      ja eticolor5
+00000363  81F98000                  cmp cx,128d
+00000367  7209                      jb eticolor5
+00000369  2EC606000001              mov colo, 01h
+                                    ; actualcolor
+0000036F  E9BAFE                    jmp etip
+00000372                        eticolor5:
+00000372  81FAB901                  cmp dx,441d
+00000376  721B                      jb eticolor6 ;JB=Jump if Below (Brinca si esta abajo)
+00000378  81FAD501                  cmp dx,469d
+0000037C  7715                      ja eticolor6 ;JA=Jmp if Above (Brinca si esta arriba)
+0000037E  81F9BA00                  cmp cx,186d
+00000382  770F                      ja eticolor6
+00000384  81F99E00                  cmp cx,158d
+00000388  7209                      jb eticolor6
+0000038A  2EC606000005              mov colo, 05h
+00000390  E999FE                    jmp etip
+00000393                        eticolor6:
+00000393  81FAB901                  cmp dx,441d
+00000397  721B                      jb eticolor7 ;JB=Jump if Below (Brinca si esta abajo)
+00000399  81FAD501                  cmp dx,469d
+0000039D  7715                      ja eticolor7 ;JA=Jmp if Above (Brinca si esta arriba)
+0000039F  81F9D800                  cmp cx,216d
+000003A3  770F                      ja eticolor7
+000003A5  81F9BC00                  cmp cx,188d
+000003A9  7209                      jb eticolor7
+000003AB  2EC606000003              mov colo, 03h
+000003B1  E978FE                    jmp etip
+000003B4                        eticolor7:
+000003B4  81FAB901                  cmp dx,441d
+000003B8  721B                      jb eticolor8 ;JB=Jump if Below (Brinca si esta abajo)
+000003BA  81FAD501                  cmp dx,469d
+000003BE  7715                      ja eticolor8 ;JA=Jmp if Above (Brinca si esta arriba)
+000003C0  81F9F600                  cmp cx,246d
+000003C4  770F                      ja eticolor8
+000003C6  81F9DA00                  cmp cx,218d
+000003CA  7209                      jb eticolor8
+000003CC  2EC606000008              mov colo, 08h
+000003D2  E957FE                    jmp etip
+000003D5                        eticolor8:
+000003D5  81FAB901                  cmp dx,441d
+000003D9  721B                      jb eticolor9 ;JB=Jump if Below (Brinca si esta abajo)
+000003DB  81FAD501                  cmp dx,469d
+000003DF  7715                      ja eticolor9 ;JA=Jmp if Above (Brinca si esta arriba)
+000003E1  81F91401                  cmp cx,276d
+000003E5  770F                      ja eticolor9
+000003E7  81F9F800                  cmp cx,248d
+000003EB  7209                      jb eticolor9
+000003ED  2EC606000007              mov colo, 07h
+000003F3  E936FE                    jmp etip
+000003F6                        eticolor9:
+000003F6  81FAB901                  cmp dx,441d
+000003FA  721B                      jb eticolor10 ;JB=Jump if Below (Brinca si esta abajo)
+000003FC  81FAD501                  cmp dx,469d
+00000400  7715                      ja eticolor10 ;JA=Jmp if Above (Brinca si esta arriba)
+00000402  81F93201                  cmp cx,306d
+00000406  770F                      ja eticolor10
+00000408  81F91601                  cmp cx,278d
+0000040C  7209                      jb eticolor10
+0000040E  2EC60600000C              mov colo, 0Ch
+00000414  E915FE                    jmp etip
+00000417                        eticolor10:
+00000417  81FAB901                  cmp dx,441d
+0000041B  721B                      jb eticolor11 ;JB=Jump if Below (Brinca si esta abajo)
+0000041D  81FAD501                  cmp dx,469d
+00000421  7715                      ja eticolor11 ;JA=Jmp if Above (Brinca si esta arriba)
+00000423  81F95001                  cmp cx,336d
+00000427  770F                      ja eticolor11
+00000429  81F93401                  cmp cx,308d
+0000042D  7209                      jb eticolor11
+0000042F  2EC60600000A              mov colo, 0ah
+00000435  E9F4FD                    jmp etip
+00000438                        eticolor11:
+00000438  81FAB901                  cmp dx,441d
+0000043C  721B                      jb eticolor12 ;JB=Jump if Below (Brinca si esta abajo)
+0000043E  81FAD501                  cmp dx,469d
+00000442  7715                      ja eticolor12 ;JA=Jmp if Above (Brinca si esta arriba)
+00000444  81F96E01                  cmp cx,366d
+00000448  770F                      ja eticolor12
+0000044A  81F95201                  cmp cx,338d
+0000044E  7209                      jb eticolor12
+00000450  2EC60600000E              mov colo, 0eh
+00000456  E9D3FD                    jmp etip
+00000459                        eticolor12:
+00000459  81FAB901                  cmp dx,441d
+0000045D  721B                      jb eticolor13 ;JB=Jump if Below (Brinca si esta abajo)
+0000045F  81FAD501                  cmp dx,469d
+00000463  7715                      ja eticolor13 ;JA=Jmp if Above (Brinca si esta arriba)
+00000465  81F98C01                  cmp cx,396d
+00000469  770F                      ja eticolor13
+0000046B  81F97001                  cmp cx,368d
+0000046F  7209                      jb eticolor13
+00000471  2EC606000009              mov colo, 09h
+00000477  E9B2FD                    jmp etip
+0000047A                        eticolor13:
+0000047A  81FAB901                  cmp dx,441d
+0000047E  721B                      jb eticolor14 ;JB=Jump if Below (Brinca si esta abajo)
+00000480  81FAD501                  cmp dx,469d
+00000484  7715                      ja eticolor14 ;JA=Jmp if Above (Brinca si esta arriba)
+00000486  81F9AA01                  cmp cx,426d
+0000048A  770F                      ja eticolor14
+0000048C  81F98E01                  cmp cx,398d
+00000490  7209                      jb eticolor14
+00000492  2EC60600000D              mov colo, 0dh
+00000498  E991FD                    jmp etip
+0000049B                        eticolor14:
+0000049B  81FAB901                  cmp dx,441d
+0000049F  721B                      jb eticolor15 ;JB=Jump if Below (Brinca si esta abajo)
+000004A1  81FAD501                  cmp dx,469d
+000004A5  7715                      ja eticolor15 ;JA=Jmp if Above (Brinca si esta arriba)
+000004A7  81F9C801                  cmp cx,456d
+000004AB  770F                      ja eticolor15
+000004AD  81F9AC01                  cmp cx,428d
+000004B1  7209                      jb eticolor15
+000004B3  2EC60600000B              mov colo, 0bh
+000004B9  E970FD                    jmp etip
+000004BC                        eticolor15:
+000004BC  81FAB901                  cmp dx,441d
+000004C0  721B                      jb etiexitbut ;JB=Jump if Below (Brinca si esta abajo)
+000004C2  81FAD501                  cmp dx,469d
+000004C6  7715                      ja etiexitbut ;JA=Jmp if Above (Brinca si esta arriba)
+000004C8  81F9E601                  cmp cx,486d
+000004CC  770F                      ja etiexitbut
+000004CE  81F9CA01                  cmp cx,458d
+000004D2  7209                      jb etiexitbut
+000004D4  2EC60600000F              mov colo, 0fh
+000004DA  E94FFD                    jmp etip
+000004DD                        etiexitbut:
+000004DD  81FAAC01                  cmp dx,428d
+000004E1  7215                      jb etitool1 ;JB=Jump if Below (Brinca si esta abajo)
+000004E3  81FAD601                  cmp dx,470d
+000004E7  770F                      ja etitool1 ;JA=Jmp if Above (Brinca si esta arriba)
+000004E9  81F96C02                  cmp cx,620d
+000004ED  7709                      ja etitool1
+000004EF  81F94202                  cmp cx,578d
+000004F3  7203                      jb etitool1
+000004F5  E98601                    jmp fin
+000004F8                        etitool1:
+000004F8  83FA4D                    cmp dx,77d
+000004FB  7218                      jb etitool2 ;JB=Jump if Below (Brinca si esta abajo)
+000004FD  83FA7D                    cmp dx,125d
+00000500  7713                      ja etitool2 ;JA=Jmp if Above (Brinca si esta arriba)
+00000502  83F913                    cmp cx,19d
+00000505  720E                      jb etitool2
+00000507  83F943                    cmp cx,67d
+0000050A  7709                      ja etitool2
+0000050C  2EC606000001              mov tool,1d
+00000512  E994FD                    jmp eti10
+00000515                        etitool2:
+00000515  83FA4D                    cmp dx,77d
+00000518  7219                      jb etitool3 ;JB=Jump if Below (Brinca si esta abajo)
+0000051A  83FA7D                    cmp dx,125d
+0000051D  7714                      ja etitool3 ;JA=Jmp if Above (Brinca si esta arriba)
+0000051F  83F961                    cmp cx,97d
+00000522  720F                      jb etitool3
+00000524  81F99100                  cmp cx,145d
+00000528  7709                      ja etitool3
+0000052A  2EC606000002              mov tool,2d
+00000530  E976FD                    jmp eti10
+00000533                        etitool3:
+00000533  81FA8F00                  cmp dx,143d
+00000537  7219                      jb etitool4 ;JB=Jump if Below (Brinca si esta abajo)
+00000539  81FAC000                  cmp dx,192d
+0000053D  7713                      ja etitool4 ;JA=Jmp if Above (Brinca si esta arriba)
+0000053F  83F913                    cmp cx,19d
+00000542  720E                      jb etitool4
+00000544  83F943                    cmp cx,67d
+00000547  7709                      ja etitool4
+00000549  2EC606000003              mov tool,3d
+0000054F  E957FD                    jmp eti10
+00000552                        etitool4:
+00000552  81FA8D00                  cmp dx,141d
+00000556  721A                      jb etitool5 ;JB=Jump if Below (Brinca si esta abajo)
+00000558  81FABD00                  cmp dx,189d
+0000055C  7714                      ja etitool5 ;JA=Jmp if Above (Brinca si esta arriba)
+0000055E  83F961                    cmp cx,97d
+00000561  720F                      jb etitool5
+00000563  81F99100                  cmp cx,145d
+00000567  7709                      ja etitool5
+00000569  2EC606000004              mov tool,4d
+0000056F  E937FD                    jmp eti10
+00000572                        etitool5:
+00000572  81FAD000                  cmp dx,208d
+00000576  7303E92EFD                jb eti10 ;JB=Jump if Below (Brinca si esta abajo)
+0000057B  81FA0001                  cmp dx,256d
+0000057F  7603E925FD                ja eti10 ;JA=Jmp if Above (Brinca si esta arriba)
+00000584  83F914                    cmp cx,20d
+00000587  7303E91DFD                jb eti10
+0000058C  83F944                    cmp cx,68d
+0000058F  7603E915FD                ja eti10
+00000594  2EC606000005              mov tool,5d
+0000059A  E90CFD                    jmp eti10
                                     
-00000CD6                        draw:
-00000CD6  2E803E000001              cmp tool,1
-00000CDC  741B                      je drawpen
-00000CDE  2E803E000002              cmp tool,2
-00000CE4  7441                      je draweraser
-00000CE6  2E803E000003              cmp tool,3
-00000CEC  7503E9AE00                je drawsquare
-00000CF1  2E803E000004              cmp tool,4
-00000CF7  745A                      je drawspray
-00000CF9                        drawpen:
-00000CF9  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
-00000CFE  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
-00000D03  E88501                    call apaga ;Llama al procedimiento APAGA para apagar el raton
+0000059D                        draw:
+0000059D  2E803E000001              cmp tool,1
+000005A3  7423                      je drawpen
+000005A5  2E803E000002              cmp tool,2
+000005AB  7453                      je draweraser
+000005AD  2E803E000003              cmp tool,3
+000005B3  7503E9C000                je drawsquare
+000005B8  2E803E000004              cmp tool,4
+000005BE  746C                      je drawspray
+000005C0  2E803E000005              cmp tool,5
+000005C6  7422                      je drawbrush
+000005C8                        drawpen:
+000005C8  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
+000005CD  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
+000005D2  E8AB01                    call apaga ;Llama al procedimiento APAGA para apagar el raton
                                     ponpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
-00000D06  B40C               1   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000D08  2EA00000           1   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000D0C  2E8B0E0000         1   mov cx,col ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000D11  2E8B160000         1   mov dx,ren ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000D16  CD10               1   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000D18  41                 1   inc cx
-00000D19  CD10               1   int 10h
-00000D1B  41                 1   inc cx
-00000D1C  CD10               1   int 10h
-00000D1E  41                 1   inc cx
-00000D1F  CD10               1   int 10h
-00000D21  41                 1   inc cx
-00000D22  CD10               1   int 10h
-                                    ; ponpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
-                                    ; ponpix col+1,ren+1 ;Llama a la macro PONPIX para desplegar PIXEL
-                                    ; ponpix col,ren+1 ;Llama a la macro PONPIX para desplegar PIXEL
-                                    ; call prende ;Llama al procedimiento PRENDE para prender el raton
-00000D24  E905F5                    jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
-00000D27                        draweraser:
-00000D27  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
-00000D2C  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
-00000D31  E85701                    call apaga ;Llama al procedimiento APAGA para apagar el raton
-                                    borpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
-00000D34  B40C               1      mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000D36  B00F               1      mov al,0fh ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000D38  2E8B0E0000         1      mov cx,col ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000D3D  2E8B160000         1      mov dx,ren ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000D42  CD10               1      int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000D44  41                 1      inc cx
-00000D45  CD10               1      int 10h
-00000D47  41                 1      inc cx
-00000D48  CD10               1      int 10h
-00000D4A  41                 1      inc cx
-00000D4B  CD10               1      int 10h
-00000D4D  41                 1      inc cx
-00000D4E  CD10               1      int 10h
-00000D50  E9D9F4                    jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
-00000D53                        drawspray:
-00000D53  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
-00000D58  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
-00000D5D  E82B01                    call apaga ;Llama al procedimiento APAGA para apagar el raton
-                                    spraypix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
-00000D60  B40C               1   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-00000D62  2EA00000           1   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
-00000D66  2E8B0E0000         1   mov cx,col ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
-00000D6B  2E8B160000         1   mov dx,ren ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
-00000D70  51                 1   push cx
-00000D71  CD10               1   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
-00000D73  83C102             1   add cx,2d
-00000D76  CD10               1   int 10h
-00000D78  83C102             1   add cx,2d
-00000D7B  CD10               1   int 10h
-00000D7D  83C102             1   add cx,2d
-00000D80  CD10               1   int 10h
-00000D82  59                 1   pop cx
-00000D83  83EA02             1   sub dx,2d
-00000D86  CD10               1   int 10h
-00000D88  83EA02             1   sub dx,2d
-00000D8B  CD10               1   int 10h
-00000D8D  83EA02             1   sub dx,2d
-00000D90  CD10               1   int 10h
-00000D92  83EA02             1   sub dx,2d
-00000D95  CD10               1   int 10h
-00000D97  83EA02             1   sub dx,2d
-00000D9A  CD10               1   int 10h
-00000D9C  E98DF4                    jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
-00000D9F                        drawsquare:
-00000D9F  E80B00                    call cuadro
-00000DA2  E987F4                    jmp etip
+000005D5  B40C               1   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
+000005D7  2EA00000           1   mov al,colo ;AL=Atributos de color, parte baja
+000005DB  2E8B0E0000         1   mov cx,col ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
+000005E0  2E8B160000         1   mov dx,ren ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
+000005E5  CD10               1   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
 
 
-00000DA5                        fin:
-00000DA5  E8E300                 call apaga ;Apaga raton
-00000DA8  E8ED00                 call cierragraf ;Cierra graficos
-00000DAB  CD20                   int 20h ;Termina el programa
+
+
+
+
+
+
+000005E7  E942FC                    jmp etip ;Salta incondicionalmente a etip y se cicla para esperar a que se oprima un boton
+000005EA                        drawbrush:
+000005EA  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
+000005EF  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
+000005F4  E88901                    call apaga ;Llama al procedimiento APAGA para apagar el raton
+000005F7  B90A00                    mov cx, 10d
+                                    ; push cx
+000005FA  E88900                    call brush
+
+000005FD  E92CFC                    jmp etip ;Salta incondicionalmente a etip y se cicla para esperar a que se oprima un boton
+00000600                        draweraser:
+00000600  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
+00000605  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
+0000060A  E87301                    call apaga ;Llama al procedimiento APAGA para apagar el raton
+                                    borpix col,ren ;Llama a la macro borpix para desplegar PIXEL
+0000060D  B40C               1      mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
+0000060F  B00F               1      mov al,0fh ;AL=Atributos de color, parte baja : Blanco como el panel de fondo
+00000611  2E8B0E0000         1      mov cx,col ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
+00000616  2E8B160000         1      mov dx,ren ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
+0000061B  CD10               1      int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
+0000061D  41                 1      inc cx
+0000061E  CD10               1      int 10h
+00000620  41                 1      inc cx
+00000621  CD10               1      int 10h
+00000623  41                 1      inc cx
+00000624  CD10               1      int 10h
+00000626  41                 1      inc cx
+00000627  CD10               1      int 10h
+00000629  E900FC                    jmp etip ;Salta incondicionalmente a etip y se cicla para esperar a que se oprima un boton
+0000062C                        drawspray:
+0000062C  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
+00000631  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
+00000636  E84701                    call apaga ;Llama al procedimiento APAGA para apagar el raton
+                                    spraypix col,ren ;Llama a la macro spraypix para desplegar PIXEL
+00000639  B40C               1   mov ah,0Ch ;Funcion 0Ch para pintar o desplegar PIXEL
+0000063B  2EA00000           1   mov al,colo ;AL=Atributos de color, parte baja
+0000063F  2E8B0E0000         1   mov cx,col ;Cx=Columna donde se despliega PIXEL
+00000644  2E8B160000         1   mov dx,ren ;Dx=Renglon donde se despliega PIXEL
+00000649  51                 1   push cx
+0000064A  CD10               1   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
+0000064C  83C102             1   add cx,2d
+0000064F  CD10               1   int 10h
+00000651  83C102             1   add cx,2d
+00000654  CD10               1   int 10h
+00000656  83C102             1   add cx,2d
+00000659  CD10               1   int 10h
+0000065B  59                 1   pop cx
+0000065C  83EA02             1   sub dx,2d
+0000065F  CD10               1   int 10h
+00000661  83EA02             1   sub dx,2d
+00000664  CD10               1   int 10h
+00000666  83EA02             1   sub dx,2d
+00000669  CD10               1   int 10h
+0000066B  83EA02             1   sub dx,2d
+0000066E  CD10               1   int 10h
+00000670  83EA02             1   sub dx,2d
+00000673  CD10               1   int 10h
+00000675  E9B4FB                    jmp etip ;Salta incondicionalmente a etip y se cicla para esperar a que se oprima un boton
+00000678                        drawsquare:
+00000678  E82700                    call cuadro
+0000067B  E9AEFB                    jmp etip
+0000067E                        fin:
+0000067E  E8FF00                 call apaga ;Apaga raton
+00000681  E80901                 call cierragraf ;Cierra graficos
+00000684  CD20                   int 20h ;Termina el programa
 
                                 ;------------------ Inicia Zona de Procedimientos ----------------------
-                                ; resetfuera proc
-                                ;     mov afueras,0
-                                ;     ret
-00000DAD                        cuadro proc
-                                    ; FIX: Doesn't prints the last pixels in col2, ren2 
-00000DAD  2E890E0000                mov col1,cx
-00000DB2  2E89160000                mov ren1,dx
-00000DB7                            cuad0:
-00000DB7  B80300                    mov ax,3d
-00000DBA  CD33                      int 33h
-00000DBC  83FB02                    cmp bx,2d
-00000DBF  75F6                      jne cuad0 ;Este ciclo (ETI1) solo termina si se oprime el botón Derecho
-00000DC1  81F9B200                  cmp cx,178d
-00000DC5  72F0                      jb cuad0 ;JB=Jump if Below (Brinca si esta abajo)
-00000DC7  81F97102                  cmp cx,625d
-00000DCB  77EA                      ja cuad0 ;JA=Jmp if Above (Brinca si esta arriba)
-00000DCD  81FA9801                  cmp dx,408d
-00000DD1  77E4                      ja cuad0
-00000DD3  83FA0F                    cmp dx,15d
-00000DD6  72DF                      jb cuad0
-00000DD8  B80200                    mov ax, 2d
-00000DDB  CD33                      int 33h
+00000686                        brush proc ; Size is defined by cx value at start of procedure
+00000686                            brush0:
+00000686  51                        push cx
+                                    ponpix col, ren
+00000687  B40C               1   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
+00000689  2EA00000           1   mov al,colo ;AL=Atributos de color, parte baja
+0000068D  2E8B0E0000         1   mov cx,col ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
+00000692  2E8B160000         1   mov dx,ren ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
+00000697  CD10               1   int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
 
-00000DDD  2E890E0000                mov col2,cx
-00000DE2  2E89160000                mov ren2,dx
-00000DE7  2E8B0E0000                mov cx,col1
-00000DEC  2E8B160000                mov dx,ren1
-00000DF1                            cuad1: ;Inicia proceso para dibujar linea superior horizontal
-00000DF1  B40C                      mov ah,0ch
-00000DF3  2EA00000                  mov al,colo
-00000DF7  CD10                      int 10h ; Pone el primer pixel
-00000DF9  2E3B0E0000                cmp cx, col2
-00000DFE  7303                      jae cuad1izq
-00000E00  41                        inc cx
-00000E01  EB01                      jmp cuad1val
-00000E03                            cuad1izq:
-00000E03  49                        dec cx
-00000E04                            cuad1val:
-00000E04  2E3B0E0000                cmp cx,col2
-00000E09  75E6                      jne cuad1 ;JBE=Jump if not Equal
-00000E0B  CD10                      int 10h
-00000E0D  2E8B0E0000                mov cx,col1
-00000E12  2E8B160000                mov dx,ren2
-00000E17                            cuad2: ;Inicia proceso para dibujar linea inferior horizontal
-00000E17  B40C                      mov ah,0ch
-00000E19  2EA00000                  mov al,colo
-00000E1D  CD10                      int 10h
-00000E1F  2E3B0E0000                cmp cx, col2
-00000E24  7303                      jae cuad2izq
-00000E26  41                        inc cx
-00000E27  EB01                      jmp cuad2val
-00000E29                            cuad2izq:
-00000E29  49                        dec cx
-00000E2A                            cuad2val:
-00000E2A  2E3B0E0000                cmp cx,col2
-00000E2F  75E6                      jne cuad2
-00000E31  CD10                      int 10h
-00000E33  2E8B0E0000                mov cx,col1
-00000E38  2E8B160000                mov dx,ren1
-00000E3D                            cuad3: ;Inicia proceso para dibujar linea izquierda vertical
-00000E3D  B40C                      mov ah,0ch
-00000E3F  2EA00000                  mov al,colo
-00000E43  CD10                      int 10h
-00000E45  2E3B160000                cmp dx, ren2
-00000E4A  7303                      jae cuad3up
-00000E4C  42                        inc dx
-00000E4D  EB01                      jmp cuad3val
-00000E4F                            cuad3up:
-00000E4F  4A                        dec dx
-00000E50                            cuad3val:
-00000E50  2E3B160000                cmp dx,ren2
-00000E55  75E6                      jne cuad3
-00000E57  CD10                      int 10h
-00000E59  2E8B0E0000                mov cx,col2
-00000E5E  2E8B160000                mov dx,ren1
-00000E63                            cuad4: ;Inicia proceso para dibujar linea derecha vertical
-00000E63  B40C                      mov ah,0ch
-00000E65  2EA00000                  mov al,colo
-00000E69  CD10                      int 10h
-00000E6B  2E3B160000                cmp dx, ren2
-00000E70  7303                      jae cuad4up
-00000E72  42                        inc dx
-00000E73  EB01                      jmp cuad4val
-00000E75                            cuad4up:
-00000E75  4A                        dec dx
-00000E76                            cuad4val:
-00000E76  2E3B160000                cmp dx,ren2
-00000E7B  75E6                      jne cuad4
-00000E7D  CD10                      int 10h
-00000E7F  B80200                    mov ax,2d
-00000E82  CD33                      int 33h
-00000E84                            ret
-00000E85                            cuadro endp
-00000E85                        prende proc
-00000E85  B80100                 mov ax,1d
-00000E88  CD33                   int 33h
-00000E8A                         ret
-00000E8B                        apaga proc
-00000E8B  B80200                 mov ax,2d
-00000E8E  CD33                   int 33h
-00000E90                         ret
-00000E91                        inigraf proc
-00000E91  B400                   mov ah,0d
-00000E93  B012                   mov al,18d
-00000E95  CD10                   int 10h
-00000E97                         ret
-00000E98                        cierragraf proc
-00000E98  B400                   mov ah,0d
-00000E9A  B003                   mov al,3d
-00000E9C  CD10                   int 10h
-00000E9E                         ret 
+
+
+
+
+
+
+
+00000699  2EFF060000                inc col
+0000069E  59                        pop cx
+0000069F  E2E5                      loop brush0
+000006A1                            ret
+000006A2                            brush endp
+000006A2                        cuadro proc
+000006A2  2E890E0000                mov col1,cx
+000006A7  2E89160000                mov ren1,dx
+000006AC                            cuad0:
+000006AC  B80300                    mov ax,3d
+000006AF  CD33                      int 33h
+000006B1  83FB02                    cmp bx,2d
+000006B4  75F6                      jne cuad0 ;Este ciclo (cuad0) solo termina si se oprime el botón Derecho
+000006B6  81F9B200                  cmp cx,178d
+000006BA  72F0                      jb cuad0 ;JB=Jump if Below (Brinca si esta abajo)
+000006BC  81F97102                  cmp cx,625d
+000006C0  77EA                      ja cuad0 ;JA=Jmp if Above (Brinca si esta arriba)
+000006C2  81FA9801                  cmp dx,408d
+000006C6  77E4                      ja cuad0
+000006C8  83FA0F                    cmp dx,15d
+000006CB  72DF                      jb cuad0
+                                    ; Apagar mouse para poner pixeles debajo
+000006CD  B80200                    mov ax, 2d
+000006D0  CD33                      int 33h
+000006D2  2E890E0000                mov col2,cx
+000006D7  2E89160000                mov ren2,dx
+000006DC  2E8B0E0000                mov cx,col1
+000006E1  2E8B160000                mov dx,ren1
+000006E6                            cuad1: ;Inicia proceso para dibujar linea superior horizontal
+000006E6  B40C                      mov ah,0ch
+000006E8  2EA00000                  mov al,colo
+000006EC  CD10                      int 10h ; Pone el primer pixel
+000006EE  2E3B0E0000                cmp cx, col2
+000006F3  7303                      jae cuad1izq
+000006F5  41                        inc cx
+000006F6  EB01                      jmp cuad1val
+000006F8                            cuad1izq:
+000006F8  49                        dec cx
+000006F9                            cuad1val:
+000006F9  2E3B0E0000                cmp cx,col2
+000006FE  75E6                      jne cuad1 ;JBE=Jump if not Equal
+00000700  CD10                      int 10h
+00000702  2E8B0E0000                mov cx,col1
+00000707  2E8B160000                mov dx,ren2
+0000070C                            cuad2: ;Inicia proceso para dibujar linea inferior horizontal
+0000070C  B40C                      mov ah,0ch
+0000070E  2EA00000                  mov al,colo
+00000712  CD10                      int 10h
+00000714  2E3B0E0000                cmp cx, col2
+00000719  7303                      jae cuad2izq
+0000071B  41                        inc cx
+0000071C  EB01                      jmp cuad2val
+0000071E                            cuad2izq:
+0000071E  49                        dec cx
+0000071F                            cuad2val:
+0000071F  2E3B0E0000                cmp cx,col2
+00000724  75E6                      jne cuad2
+00000726  CD10                      int 10h
+00000728  2E8B0E0000                mov cx,col1
+0000072D  2E8B160000                mov dx,ren1
+00000732                            cuad3: ;Inicia proceso para dibujar linea izquierda vertical
+00000732  B40C                      mov ah,0ch
+00000734  2EA00000                  mov al,colo
+00000738  CD10                      int 10h
+0000073A  2E3B160000                cmp dx, ren2
+0000073F  7303                      jae cuad3up
+00000741  42                        inc dx
+00000742  EB01                      jmp cuad3val
+00000744                            cuad3up:
+00000744  4A                        dec dx
+00000745                            cuad3val:
+00000745  2E3B160000                cmp dx,ren2
+0000074A  75E6                      jne cuad3
+0000074C  CD10                      int 10h
+0000074E  2E8B0E0000                mov cx,col2
+00000753  2E8B160000                mov dx,ren1
+00000758                            cuad4: ;Inicia proceso para dibujar linea derecha vertical
+00000758  B40C                      mov ah,0ch
+0000075A  2EA00000                  mov al,colo
+0000075E  CD10                      int 10h
+00000760  2E3B160000                cmp dx, ren2
+00000765  7303                      jae cuad4up
+00000767  42                        inc dx
+00000768  EB01                      jmp cuad4val
+0000076A                            cuad4up:
+0000076A  4A                        dec dx
+0000076B                            cuad4val:
+0000076B  2E3B160000                cmp dx,ren2
+00000770  75E6                      jne cuad4
+00000772  CD10                      int 10h
+00000774  B80200                    mov ax,2d
+00000777  CD33                      int 33h
+00000779                            ret
+0000077A                            cuadro endp
+0000077A                        prende proc
+0000077A  B80100                 mov ax,1d
+0000077D  CD33                   int 33h
+0000077F                         ret
+00000780                        apaga proc
+00000780  B80200                 mov ax,2d
+00000783  CD33                   int 33h
+00000785                         ret
+00000786                        inigraf proc
+00000786  B400                   mov ah,0d
+00000788  B012                   mov al,18d
+0000078A  CD10                   int 10h
+0000078C                         ret
+0000078D                        cierragraf proc
+0000078D  B400                   mov ah,0d
+0000078F  B003                   mov al,3d
+00000791  CD10                   int 10h
+00000793                         ret 
 
 
 
@@ -1727,9 +760,9 @@ Binary Map:
 
 Segment                  Pos(file)     RVA  Size(fil) Size(mem)
 ---------------------------------------------------------------
-CSEG                            0      100       D9F       D9F
+CSEG                            0      100       694       694
 ---------------------------------------------------------------
-                                                 D9F       D9F
+                                                 694       694
 
 
 Macros:
@@ -1804,7 +837,6 @@ _STATIC  . . . . . . . . . . . .        Func
 _STATICREF . . . . . . . . . . .        Proc
 _V . . . . . . . . . . . . . . .        Func
 _VINVOKE . . . . . . . . . . . .        Proc
-actualcolor  . . . . . . . . . .        Proc
 arginvoke  . . . . . . . . . . .        Func
 borpix . . . . . . . . . . . . .        Proc
 numero . . . . . . . . . . . . .        Proc
@@ -2113,31 +1145,33 @@ Segments and Groups:
 
                 N a m e                 Size     Length   Align   Combine Class
 
-CSEG . . . . . . . . . . . . . .        16 Bit   0E9F     Para    Private ''
+CSEG . . . . . . . . . . . . . .        16 Bit   0794     Para    Private ''
 
 
 Procedures, parameters and locals:
 
                 N a m e                 Type     Value    Segment  Length
 
-apaga  . . . . . . . . . . . . .        P Near   0E8B     CSEG     0000 Public   
-cierragraf . . . . . . . . . . .        P Near   0E98     CSEG     0000 Public   
-cuadro . . . . . . . . . . . . .        P Near   0DAD     CSEG     00D8 Public   
-  cuad2  . . . . . . . . . . . .        L Near   0E17     CSEG
-  cuad2izq . . . . . . . . . . .        L Near   0E29     CSEG
-  cuad2val . . . . . . . . . . .        L Near   0E2A     CSEG
-  cuad4val . . . . . . . . . . .        L Near   0E76     CSEG
-  cuad1val . . . . . . . . . . .        L Near   0E04     CSEG
-  cuad3  . . . . . . . . . . . .        L Near   0E3D     CSEG
-  cuad4up  . . . . . . . . . . .        L Near   0E75     CSEG
-  cuad1izq . . . . . . . . . . .        L Near   0E03     CSEG
-  cuad0  . . . . . . . . . . . .        L Near   0DB7     CSEG
-  cuad3val . . . . . . . . . . .        L Near   0E50     CSEG
-  cuad4  . . . . . . . . . . . .        L Near   0E63     CSEG
-  cuad3up  . . . . . . . . . . .        L Near   0E4F     CSEG
-  cuad1  . . . . . . . . . . . .        L Near   0DF1     CSEG
-inigraf  . . . . . . . . . . . .        P Near   0E91     CSEG     0000 Public   
-prende . . . . . . . . . . . . .        P Near   0E85     CSEG     0000 Public   
+apaga  . . . . . . . . . . . . .        P Near   0780     CSEG     0000 Public   
+brush  . . . . . . . . . . . . .        P Near   0686     CSEG     001C Public   
+  brush0 . . . . . . . . . . . .        L Near   0686     CSEG
+cierragraf . . . . . . . . . . .        P Near   078D     CSEG     0000 Public   
+cuadro . . . . . . . . . . . . .        P Near   06A2     CSEG     00D8 Public   
+  cuad2  . . . . . . . . . . . .        L Near   070C     CSEG
+  cuad2izq . . . . . . . . . . .        L Near   071E     CSEG
+  cuad2val . . . . . . . . . . .        L Near   071F     CSEG
+  cuad4val . . . . . . . . . . .        L Near   076B     CSEG
+  cuad1val . . . . . . . . . . .        L Near   06F9     CSEG
+  cuad3  . . . . . . . . . . . .        L Near   0732     CSEG
+  cuad4up  . . . . . . . . . . .        L Near   076A     CSEG
+  cuad1izq . . . . . . . . . . .        L Near   06F8     CSEG
+  cuad0  . . . . . . . . . . . .        L Near   06AC     CSEG
+  cuad3val . . . . . . . . . . .        L Near   0745     CSEG
+  cuad4  . . . . . . . . . . . .        L Near   0758     CSEG
+  cuad3up  . . . . . . . . . . .        L Near   0744     CSEG
+  cuad1  . . . . . . . . . . . .        L Near   06E6     CSEG
+inigraf  . . . . . . . . . . . .        P Near   0786     CSEG     0000 Public   
+prende . . . . . . . . . . . . .        P Near   077A     CSEG     0000 Public   
 
 
 Symbols:
@@ -2152,40 +1186,42 @@ col  . . . . . . . . . . . . . .        Word             153h CSEG
 col1 . . . . . . . . . . . . . .        Word             15Ah CSEG 
 col2 . . . . . . . . . . . . . .        Word             15Eh CSEG 
 colo . . . . . . . . . . . . . .        Byte             158h CSEG 
-draw . . . . . . . . . . . . . .        L Near           CD6h CSEG 
-draweraser . . . . . . . . . . .        L Near           D27h CSEG 
-drawpen  . . . . . . . . . . . .        L Near           CF9h CSEG 
-drawspray  . . . . . . . . . . .        L Near           D53h CSEG 
-drawsquare . . . . . . . . . . .        L Near           D9Fh CSEG 
+draw . . . . . . . . . . . . . .        L Near           59Dh CSEG 
+drawbrush  . . . . . . . . . . .        L Near           5EAh CSEG 
+draweraser . . . . . . . . . . .        L Near           600h CSEG 
+drawpen  . . . . . . . . . . . .        L Near           5C8h CSEG 
+drawspray  . . . . . . . . . . .        L Near           62Ch CSEG 
+drawsquare . . . . . . . . . . .        L Near           678h CSEG 
 err  . . . . . . . . . . . . . .        L Near           21Eh CSEG 
 eti0 . . . . . . . . . . . . . .        L Near           162h CSEG 
 eti1 . . . . . . . . . . . . . .        L Near           177h CSEG 
 eti10  . . . . . . . . . . . . .        L Near           2A9h CSEG 
 eti2 . . . . . . . . . . . . . .        L Near           190h CSEG 
 eticolor0  . . . . . . . . . . .        L Near           2D5h CSEG 
-eticolor1  . . . . . . . . . . .        L Near           46Ch CSEG 
-eticolor10 . . . . . . . . . . .        L Near           B6Fh CSEG 
-eticolor11 . . . . . . . . . . .        L Near           B90h CSEG 
-eticolor12 . . . . . . . . . . .        L Near           BB1h CSEG 
-eticolor13 . . . . . . . . . . .        L Near           BD2h CSEG 
-eticolor14 . . . . . . . . . . .        L Near           BF3h CSEG 
-eticolor15 . . . . . . . . . . .        L Near           C14h CSEG 
-eticolor2  . . . . . . . . . . .        L Near           603h CSEG 
-eticolor3  . . . . . . . . . . .        L Near           79Ah CSEG 
-eticolor4  . . . . . . . . . . .        L Near           931h CSEG 
-eticolor5  . . . . . . . . . . .        L Near           ACAh CSEG 
-eticolor6  . . . . . . . . . . .        L Near           AEBh CSEG 
-eticolor7  . . . . . . . . . . .        L Near           B0Ch CSEG 
-eticolor8  . . . . . . . . . . .        L Near           B2Dh CSEG 
-eticolor9  . . . . . . . . . . .        L Near           B4Eh CSEG 
-etiexitbut . . . . . . . . . . .        L Near           C35h CSEG 
+eticolor1  . . . . . . . . . . .        L Near           2F4h CSEG 
+eticolor10 . . . . . . . . . . .        L Near           417h CSEG 
+eticolor11 . . . . . . . . . . .        L Near           438h CSEG 
+eticolor12 . . . . . . . . . . .        L Near           459h CSEG 
+eticolor13 . . . . . . . . . . .        L Near           47Ah CSEG 
+eticolor14 . . . . . . . . . . .        L Near           49Bh CSEG 
+eticolor15 . . . . . . . . . . .        L Near           4BCh CSEG 
+eticolor2  . . . . . . . . . . .        L Near           313h CSEG 
+eticolor3  . . . . . . . . . . .        L Near           332h CSEG 
+eticolor4  . . . . . . . . . . .        L Near           351h CSEG 
+eticolor5  . . . . . . . . . . .        L Near           372h CSEG 
+eticolor6  . . . . . . . . . . .        L Near           393h CSEG 
+eticolor7  . . . . . . . . . . .        L Near           3B4h CSEG 
+eticolor8  . . . . . . . . . . .        L Near           3D5h CSEG 
+eticolor9  . . . . . . . . . . .        L Near           3F6h CSEG 
+etiexitbut . . . . . . . . . . .        L Near           4DDh CSEG 
 etip . . . . . . . . . . . . . .        L Near           22Ch CSEG 
-etitool1 . . . . . . . . . . . .        L Near           C50h CSEG 
-etitool2 . . . . . . . . . . . .        L Near           C6Dh CSEG 
-etitool3 . . . . . . . . . . . .        L Near           C8Bh CSEG 
-etitool4 . . . . . . . . . . . .        L Near           CAAh CSEG 
+etitool1 . . . . . . . . . . . .        L Near           4F8h CSEG 
+etitool2 . . . . . . . . . . . .        L Near           515h CSEG 
+etitool3 . . . . . . . . . . . .        L Near           533h CSEG 
+etitool4 . . . . . . . . . . . .        L Near           552h CSEG 
+etitool5 . . . . . . . . . . . .        L Near           572h CSEG 
 filename . . . . . . . . . . . .        Byte[13]         144h CSEG 
-fin  . . . . . . . . . . . . . .        L Near           DA5h CSEG 
+fin  . . . . . . . . . . . . . .        L Near           67Eh CSEG 
 handle . . . . . . . . . . . . .        Word             151h CSEG 
 ren  . . . . . . . . . . . . . .        Word             155h CSEG 
 ren1 . . . . . . . . . . . . . .        Word             15Ch CSEG 
@@ -2193,4 +1229,4 @@ ren2 . . . . . . . . . . . . . .        Word             160h CSEG
 start  . . . . . . . . . . . . .        L Near           22Ch CSEG 
 tool . . . . . . . . . . . . . .        Byte             159h CSEG 
 
-prog12.asm: 644 lines, 2 passes, 58 ms, 0 warnings, 0 errors
+prog12.asm: 644 lines, 2 passes, 14 ms, 0 warnings, 0 errors

@@ -1,4 +1,3 @@
-;Programa 12.- Programa que carga o despliega una imagen BMP pixel por pixel en pantalla (640x480)
 CSEG    SEGMENT     ; code segment starts here.
     org 100h
     jmp eti0
@@ -12,12 +11,14 @@ ren dw 479 ;REN=479d
 ; afueras db 0
 buffer db ? ;DB=Define Byte, para almacenar valores entre 0 y 255, o sea 8 bits
 colo db ? ; ? = Valor NO definido de inicio
+; Cual herramienta se esta usando
 tool db 1
-; datos para cuadro
+; Datos para cuadro
 col1 dw ?
 ren1 dw ?
 col2 dw ?
 ren2 dw ?
+; Macro para mostrar posicion de mouse
 numero macro num
  mov ax,num
  mov bl,100d
@@ -67,7 +68,7 @@ eti1:
  loop eti1
 ;*************************************************************************************************************************
  mov ah,00h ;Funcion 00H para la INT 10H (Resolucion de Pantalla)
- mov al,12h ;AL=Modo de despliegue o resolución, 18 = 640x480 a 16 colores
+ mov al,12h ;AL=Modo de despliegue o resolución, 12h = 640x480 a 16 colores
  int 10h ;INT 10H funcion 00H, inicializar resolucion
  ;***********************************************************************************************************************
 eti2:
@@ -113,13 +114,6 @@ eti2:
  mov colo,03h
  
  jmp start ; jumps to drawing section
- ;***********************************************************************************************************************
-;  mov ah,07h
-;  int 21h ;Espera que se oprima una tecla
-;  mov ah,00h ;Funcion 00H para devolver al modo TEXTO
-;  mov al,3d ;AL=Modo de despliegue o resolución, 3 = 80x25 a 16 colores (Modo TEXTO)
-;  int 10h ;INT 10H funcion 00H, inicializar resolucion
-;  int 20h ;Fin del Programa (Cuando se carga la imagen)
 ;***********************************************************************************************************************
 err: ;Se llega hasta aqui solo si hay error en la lectura del archivo
  mov ah,09h
@@ -128,11 +122,12 @@ err: ;Se llega hasta aqui solo si hay error en la lectura del archivo
  mov ah,07h
  int 21h ;Espera a que se oprima tecla
  int 20h ;Fin del Programa (Cuando NO se carga la imagen)
+;  Macros
 spraypix macro ren,col
- mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
- mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
- mov cx,ren ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
- mov dx,col ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
+ mov ah,0Ch ;Funcion 0Ch para pintar o desplegar PIXEL
+ mov al,colo ;AL=Atributos de color, parte baja
+ mov cx,ren ;Cx=Columna donde se despliega PIXEL
+ mov dx,col ;Dx=Renglon donde se despliega PIXEL
  push cx
  int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
  add cx,2d
@@ -155,22 +150,14 @@ spraypix macro ren,col
  endm
 ponpix macro co,re ;Macro que recibe dos parámetros, en C y en R
  mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
- mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
+ mov al,colo ;AL=Atributos de color, parte baja
  mov cx,co ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
  mov dx,re ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
  int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
- inc cx
- int 10h
- inc cx
- int 10h
- inc cx
- int 10h
- inc cx
- int 10h
  endm
 borpix macro ren, col
     mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
-    mov al,0fh ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
+    mov al,0fh ;AL=Atributos de color, parte baja : Blanco como el panel de fondo
     mov cx,ren ;Cx=Columna donde se despliega PIXEL (empieza desde cero)
     mov dx,col ;Dx=Renglon donde se despliega PIXEL (empieza desde cero)
     int 10h ;INT 10H funcion 0CH, despliega PIXEL de color en posicion CX (Columna), DX (Renglon)
@@ -182,53 +169,21 @@ borpix macro ren, col
     int 10h
     inc cx
     int 10h
-    endm   
-;  TODO: Implement, bigger eraser
-actualcolor macro
-    ponpix 21d,145d;Llama a la macro PONPIX para desplegar PIXEL
-    ponpix 22d,145d;Llama a la macro PONPIX para desplegar PIXEL
-    ponpix 23d,145d;Llama a la macro PONPIX para desplegar PIXEL
-    ponpix 24d,145d;Llama a la macro PONPIX para desplegar PIXEL
-    ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
-    ponpix 25d,145d;Llama a la macro PONPIX para desplegar PIXEL
-    ponpix 26d,145d;Llama a la macro PONPIX para desplegar PIXEL
-    ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-    ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-    ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-    ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-    ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-    ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
-    ponpix 27d,146d;Llama a la macro PONPIX para desplegar PIXEL
     endm
-;  Falta idear como integrarlo
-; dentro macro col1,col2,ren1,ren2
-;     cmp cx,col1
-;     jb etifuera ;JB=Jump if Below (Brinca si esta abajo)
-;     cmp cx,col2
-;     ja etifuera ;JA=Jmp if Above (Brinca si esta arriba)
-;     cmp dx,ren1
-;     ja etifuera
-;     cmp dx,ren2
-;     jb etifuera
-;     jmp etidentro
-;     etifuera:
-;         inc afueras
-;     etidentro:
-;         endm
-
     
 ;Inicio del Programa Principal
 start:
-; call inigraf ;Llama al procedimiento para iniciar graficos
 etip:
     call prende ;Llama al procedimiento para prender el raton
     ; Muestra posicion en X y Y
+    ; Define en que posicion se mostrara
     mov col, cx
     mov ren, dx
     mov ah,02h
     mov dl, 0d
     mov dh, 0d
     int 10h
+    ; Los escribe en pantalla con un espacio de separacion
     numero col
     mov ah,02h
     mov dl,' ' ;Mover a DL un espacio en blanco
@@ -240,7 +195,7 @@ eti10:
     cmp bx,0d
     je etip ;Mientras NO se oprima ningun boton, se cicla
     cmp bx,1d
-    jne eti10 ;El programa termina si se oprime el boton derecho o los 2 botones
+    jne eti10 ;El programa regresa a eti10 si no es boton izq
     
     ; Solo puede pintar en el cuadro blanco
     cmp cx,178d
@@ -262,7 +217,7 @@ eticolor0:
     cmp cx,8d
     jb eticolor1
     mov colo, 00h
-    actualcolor
+    ; actualcolor
     jmp etip
 
 eticolor1:
@@ -275,7 +230,7 @@ eticolor1:
     cmp cx,38d
     jb eticolor2
     mov colo, 04h
-    actualcolor
+    ; actualcolor
     jmp etip
 eticolor2:
     cmp dx,441d
@@ -287,7 +242,7 @@ eticolor2:
     cmp cx,68d
     jb eticolor3
     mov colo, 02h
-    actualcolor
+    ; actualcolor
     jmp etip
 eticolor3:
     cmp dx,441d
@@ -299,7 +254,7 @@ eticolor3:
     cmp cx,98d
     jb eticolor4
     mov colo, 06h
-    actualcolor
+    ; actualcolor
     jmp etip
 eticolor4:
     cmp dx,441d
@@ -311,7 +266,7 @@ eticolor4:
     cmp cx,128d
     jb eticolor5
     mov colo, 01h
-    actualcolor
+    ; actualcolor
     jmp etip
 eticolor5:
     cmp dx,441d
@@ -479,17 +434,29 @@ etitool3:
     jmp eti10
 etitool4:
     cmp dx,141d
-    jb eti10 ;JB=Jump if Below (Brinca si esta abajo)
+    jb etitool5 ;JB=Jump if Below (Brinca si esta abajo)
     cmp dx,189d
-    ja eti10 ;JA=Jmp if Above (Brinca si esta arriba)
+    ja etitool5 ;JA=Jmp if Above (Brinca si esta arriba)
     cmp cx,97d
-    jb eti10
+    jb etitool5
     cmp cx,145d
-    ja eti10
+    ja etitool5
     mov tool,4d
+    jmp eti10
+etitool5:
+    cmp dx,208d
+    jb eti10 ;JB=Jump if Below (Brinca si esta abajo)
+    cmp dx,256d
+    ja eti10 ;JA=Jmp if Above (Brinca si esta arriba)
+    cmp cx,20d
+    jb eti10
+    cmp cx,68d
+    ja eti10
+    mov tool,5d
     jmp eti10
     
 draw:
+; TODO: Refactor mov cx; mov dx;
     cmp tool,1
     je drawpen
     cmp tool,2
@@ -498,42 +465,51 @@ draw:
     je drawsquare
     cmp tool,4
     je drawspray
+    cmp tool,5
+    je drawbrush
 drawpen:
     mov col,cx ;Carga en COL el valor de la columna
     mov ren,dx ;Carga en REN el valor del renglon
     call apaga ;Llama al procedimiento APAGA para apagar el raton
     ponpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
-    ; ponpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
-    ; ponpix col+1,ren+1 ;Llama a la macro PONPIX para desplegar PIXEL
-    ; ponpix col,ren+1 ;Llama a la macro PONPIX para desplegar PIXEL
-    ; call prende ;Llama al procedimiento PRENDE para prender el raton
-    jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
+    jmp etip ;Salta incondicionalmente a etip y se cicla para esperar a que se oprima un boton
+drawbrush:
+    mov col,cx ;Carga en COL el valor de la columna
+    mov ren,dx ;Carga en REN el valor del renglon
+    call apaga ;Llama al procedimiento APAGA para apagar el raton
+    mov cx, 10d ; Define el tamaño del pincel
+    call brush
+    jmp etip ;Salta incondicionalmente a etip y se cicla para esperar a que se oprima un boton
 draweraser:
     mov col,cx ;Carga en COL el valor de la columna
     mov ren,dx ;Carga en REN el valor del renglon
     call apaga ;Llama al procedimiento APAGA para apagar el raton
-    borpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
-    jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
+    borpix col,ren ;Llama a la macro borpix para desplegar PIXEL
+    jmp etip ;Salta incondicionalmente a etip y se cicla para esperar a que se oprima un boton
 drawspray:
     mov col,cx ;Carga en COL el valor de la columna
     mov ren,dx ;Carga en REN el valor del renglon
     call apaga ;Llama al procedimiento APAGA para apagar el raton
-    spraypix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
-    jmp etip ;Salta incondicionalmente a ETI0 y se cicla para esperar a que se oprima un boton
+    spraypix col,ren ;Llama a la macro spraypix para desplegar PIXEL
+    jmp etip ;Salta incondicionalmente a etip y se cicla para esperar a que se oprima un boton
 drawsquare:
     call cuadro
     jmp etip
-
-
 fin:
  call apaga ;Apaga raton
  call cierragraf ;Cierra graficos
  int 20h ;Termina el programa
 
 ;------------------ Inicia Zona de Procedimientos ----------------------
-; resetfuera proc
-;     mov afueras,0
-;     ret
+brush proc ; Size is defined by cx value at start of procedure
+    brush0:
+    push cx
+    ponpix col, ren
+    inc col
+    pop cx
+    loop brush0
+    ret
+    brush endp
 cuadro proc
     mov col1,cx
     mov ren1,dx
@@ -541,7 +517,7 @@ cuadro proc
     mov ax,3d
     int 33h
     cmp bx,2d
-    jne cuad0 ;Este ciclo (ETI1) solo termina si se oprime el botón Derecho
+    jne cuad0 ;Este ciclo (cuad0) solo termina si se oprime el botón Derecho
     cmp cx,178d
     jb cuad0 ;JB=Jump if Below (Brinca si esta abajo)
     cmp cx,625d
@@ -550,9 +526,9 @@ cuadro proc
     ja cuad0
     cmp dx,15d
     jb cuad0
+    ; Apagar mouse para poner pixeles debajo
     mov ax, 2d
     int 33h
-
     mov col2,cx
     mov ren2,dx
     mov cx,col1
