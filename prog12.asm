@@ -535,9 +535,7 @@ fin:
 ;     mov afueras,0
 ;     ret
 cuadro proc
-    ; TODO: Draws the lines in all directions
-    ; TODO: Hide mouse after right click to print below it 
-    ; TODO: continuous right click doesnt creates lines like a brush 
+    ; FIX: Doesn't prints the last pixels in col2, ren2 
     mov col1,cx
     mov ren1,dx
     cuad0:
@@ -553,6 +551,8 @@ cuadro proc
     ja cuad0
     cmp dx,15d
     jb cuad0
+    mov ax, 2d
+    int 33h
 
     mov col2,cx
     mov ren2,dx
@@ -616,6 +616,8 @@ cuadro proc
     cuad4val:
     cmp dx,ren2
     jne cuad4
+    mov ax,2d
+    int 33h
     ret
     cuadro endp
 prende proc
