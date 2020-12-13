@@ -224,7 +224,7 @@ prog12.asm
 0000022C                        start:
                                 ; call inigraf ;Llama al procedimiento para iniciar graficos
 0000022C                        etip:
-0000022C  E84E0C                    call prende ;Llama al procedimiento para prender el raton
+0000022C  E8560C                    call prende ;Llama al procedimiento para prender el raton
                                     ; Muestra posicion en X y Y
 0000022F  2E890E0000                mov col, cx
 00000234  2E89160000                mov ren, dx
@@ -1530,7 +1530,7 @@ prog12.asm
 00000CF9                        drawpen:
 00000CF9  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
 00000CFE  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
-00000D03  E87D01                    call apaga ;Llama al procedimiento APAGA para apagar el raton
+00000D03  E88501                    call apaga ;Llama al procedimiento APAGA para apagar el raton
                                     ponpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
 00000D06  B40C               1   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
 00000D08  2EA00000           1   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
@@ -1553,7 +1553,7 @@ prog12.asm
 00000D27                        draweraser:
 00000D27  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
 00000D2C  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
-00000D31  E84F01                    call apaga ;Llama al procedimiento APAGA para apagar el raton
+00000D31  E85701                    call apaga ;Llama al procedimiento APAGA para apagar el raton
                                     borpix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
 00000D34  B40C               1      mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
 00000D36  B00F               1      mov al,0fh ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
@@ -1572,7 +1572,7 @@ prog12.asm
 00000D53                        drawspray:
 00000D53  2E890E0000                mov col,cx ;Carga en COL el valor de la columna
 00000D58  2E89160000                mov ren,dx ;Carga en REN el valor del renglon
-00000D5D  E82301                    call apaga ;Llama al procedimiento APAGA para apagar el raton
+00000D5D  E82B01                    call apaga ;Llama al procedimiento APAGA para apagar el raton
                                     spraypix col,ren ;Llama a la macro PONPIX para desplegar PIXEL
 00000D60  B40C               1   mov ah,0Ch ;Funcion 12d=0Ch para pintar o desplegar PIXEL
 00000D62  2EA00000           1   mov al,colo ;AL=Atributos de color, parte baja: 1010b=10d=Color Verde (vea Paleta de Color)
@@ -1604,8 +1604,8 @@ prog12.asm
 
 
 00000DA5                        fin:
-00000DA5  E8DB00                 call apaga ;Apaga raton
-00000DA8  E8E500                 call cierragraf ;Cierra graficos
+00000DA5  E8E300                 call apaga ;Apaga raton
+00000DA8  E8ED00                 call cierragraf ;Cierra graficos
 00000DAB  CD20                   int 20h ;Termina el programa
 
                                 ;------------------ Inicia Zona de Procedimientos ----------------------
@@ -1613,8 +1613,7 @@ prog12.asm
                                 ;     mov afueras,0
                                 ;     ret
 00000DAD                        cuadro proc
-                                    ; TODO: Hide mouse after right click to print below it 
-                                    ; TODO: continuous right click doesnt creates lines like a brush 
+                                    ; FIX: Doesn't prints the last pixels in col2, ren2 
 00000DAD  2E890E0000                mov col1,cx
 00000DB2  2E89160000                mov ren1,dx
 00000DB7                            cuad0:
@@ -1650,73 +1649,77 @@ prog12.asm
 00000E04                            cuad1val:
 00000E04  2E3B0E0000                cmp cx,col2
 00000E09  75E6                      jne cuad1 ;JBE=Jump if not Equal
-00000E0B  2E8B0E0000                mov cx,col1
-00000E10  2E8B160000                mov dx,ren2
-00000E15                            cuad2: ;Inicia proceso para dibujar linea inferior horizontal
-00000E15  B40C                      mov ah,0ch
-00000E17  2EA00000                  mov al,colo
-00000E1B  CD10                      int 10h
-00000E1D  2E3B0E0000                cmp cx, col2
-00000E22  7303                      jae cuad2izq
-00000E24  41                        inc cx
-00000E25  EB01                      jmp cuad2val
-00000E27                            cuad2izq:
-00000E27  49                        dec cx
-00000E28                            cuad2val:
-00000E28  2E3B0E0000                cmp cx,col2
-00000E2D  75E6                      jne cuad2
-00000E2F  2E8B0E0000                mov cx,col1
-00000E34  2E8B160000                mov dx,ren1
-00000E39                            cuad3: ;Inicia proceso para dibujar linea izquierda vertical
-00000E39  B40C                      mov ah,0ch
-00000E3B  2EA00000                  mov al,colo
-00000E3F  CD10                      int 10h
-00000E41  2E3B160000                cmp dx, ren2
-00000E46  7303                      jae cuad3up
-00000E48  42                        inc dx
-00000E49  EB01                      jmp cuad3val
-00000E4B                            cuad3up:
-00000E4B  4A                        dec dx
-00000E4C                            cuad3val:
-00000E4C  2E3B160000                cmp dx,ren2
-00000E51  75E6                      jne cuad3
-00000E53  2E8B0E0000                mov cx,col2
-00000E58  2E8B160000                mov dx,ren1
-00000E5D                            cuad4: ;Inicia proceso para dibujar linea derecha vertical
-00000E5D  B40C                      mov ah,0ch
-00000E5F  2EA00000                  mov al,colo
-00000E63  CD10                      int 10h
-00000E65  2E3B160000                cmp dx, ren2
-00000E6A  7303                      jae cuad4up
-00000E6C  42                        inc dx
-00000E6D  EB01                      jmp cuad4val
-00000E6F                            cuad4up:
-00000E6F  4A                        dec dx
-00000E70                            cuad4val:
-00000E70  2E3B160000                cmp dx,ren2
-00000E75  75E6                      jne cuad4
-00000E77  B80200                    mov ax,2d
-00000E7A  CD33                      int 33h
-00000E7C                            ret
-00000E7D                            cuadro endp
-00000E7D                        prende proc
-00000E7D  B80100                 mov ax,1d
-00000E80  CD33                   int 33h
-00000E82                         ret
-00000E83                        apaga proc
-00000E83  B80200                 mov ax,2d
-00000E86  CD33                   int 33h
-00000E88                         ret
-00000E89                        inigraf proc
-00000E89  B400                   mov ah,0d
-00000E8B  B012                   mov al,18d
-00000E8D  CD10                   int 10h
-00000E8F                         ret
-00000E90                        cierragraf proc
-00000E90  B400                   mov ah,0d
-00000E92  B003                   mov al,3d
-00000E94  CD10                   int 10h
-00000E96                         ret 
+00000E0B  CD10                      int 10h
+00000E0D  2E8B0E0000                mov cx,col1
+00000E12  2E8B160000                mov dx,ren2
+00000E17                            cuad2: ;Inicia proceso para dibujar linea inferior horizontal
+00000E17  B40C                      mov ah,0ch
+00000E19  2EA00000                  mov al,colo
+00000E1D  CD10                      int 10h
+00000E1F  2E3B0E0000                cmp cx, col2
+00000E24  7303                      jae cuad2izq
+00000E26  41                        inc cx
+00000E27  EB01                      jmp cuad2val
+00000E29                            cuad2izq:
+00000E29  49                        dec cx
+00000E2A                            cuad2val:
+00000E2A  2E3B0E0000                cmp cx,col2
+00000E2F  75E6                      jne cuad2
+00000E31  CD10                      int 10h
+00000E33  2E8B0E0000                mov cx,col1
+00000E38  2E8B160000                mov dx,ren1
+00000E3D                            cuad3: ;Inicia proceso para dibujar linea izquierda vertical
+00000E3D  B40C                      mov ah,0ch
+00000E3F  2EA00000                  mov al,colo
+00000E43  CD10                      int 10h
+00000E45  2E3B160000                cmp dx, ren2
+00000E4A  7303                      jae cuad3up
+00000E4C  42                        inc dx
+00000E4D  EB01                      jmp cuad3val
+00000E4F                            cuad3up:
+00000E4F  4A                        dec dx
+00000E50                            cuad3val:
+00000E50  2E3B160000                cmp dx,ren2
+00000E55  75E6                      jne cuad3
+00000E57  CD10                      int 10h
+00000E59  2E8B0E0000                mov cx,col2
+00000E5E  2E8B160000                mov dx,ren1
+00000E63                            cuad4: ;Inicia proceso para dibujar linea derecha vertical
+00000E63  B40C                      mov ah,0ch
+00000E65  2EA00000                  mov al,colo
+00000E69  CD10                      int 10h
+00000E6B  2E3B160000                cmp dx, ren2
+00000E70  7303                      jae cuad4up
+00000E72  42                        inc dx
+00000E73  EB01                      jmp cuad4val
+00000E75                            cuad4up:
+00000E75  4A                        dec dx
+00000E76                            cuad4val:
+00000E76  2E3B160000                cmp dx,ren2
+00000E7B  75E6                      jne cuad4
+00000E7D  CD10                      int 10h
+00000E7F  B80200                    mov ax,2d
+00000E82  CD33                      int 33h
+00000E84                            ret
+00000E85                            cuadro endp
+00000E85                        prende proc
+00000E85  B80100                 mov ax,1d
+00000E88  CD33                   int 33h
+00000E8A                         ret
+00000E8B                        apaga proc
+00000E8B  B80200                 mov ax,2d
+00000E8E  CD33                   int 33h
+00000E90                         ret
+00000E91                        inigraf proc
+00000E91  B400                   mov ah,0d
+00000E93  B012                   mov al,18d
+00000E95  CD10                   int 10h
+00000E97                         ret
+00000E98                        cierragraf proc
+00000E98  B400                   mov ah,0d
+00000E9A  B003                   mov al,3d
+00000E9C  CD10                   int 10h
+00000E9E                         ret 
 
 
 
@@ -1724,9 +1727,9 @@ Binary Map:
 
 Segment                  Pos(file)     RVA  Size(fil) Size(mem)
 ---------------------------------------------------------------
-CSEG                            0      100       D97       D97
+CSEG                            0      100       D9F       D9F
 ---------------------------------------------------------------
-                                                 D97       D97
+                                                 D9F       D9F
 
 
 Macros:
@@ -2110,31 +2113,31 @@ Segments and Groups:
 
                 N a m e                 Size     Length   Align   Combine Class
 
-CSEG . . . . . . . . . . . . . .        16 Bit   0E97     Para    Private ''
+CSEG . . . . . . . . . . . . . .        16 Bit   0E9F     Para    Private ''
 
 
 Procedures, parameters and locals:
 
                 N a m e                 Type     Value    Segment  Length
 
-apaga  . . . . . . . . . . . . .        P Near   0E83     CSEG     0000 Public   
-cierragraf . . . . . . . . . . .        P Near   0E90     CSEG     0000 Public   
-cuadro . . . . . . . . . . . . .        P Near   0DAD     CSEG     00D0 Public   
-  cuad2  . . . . . . . . . . . .        L Near   0E15     CSEG
-  cuad2izq . . . . . . . . . . .        L Near   0E27     CSEG
-  cuad2val . . . . . . . . . . .        L Near   0E28     CSEG
-  cuad4val . . . . . . . . . . .        L Near   0E70     CSEG
+apaga  . . . . . . . . . . . . .        P Near   0E8B     CSEG     0000 Public   
+cierragraf . . . . . . . . . . .        P Near   0E98     CSEG     0000 Public   
+cuadro . . . . . . . . . . . . .        P Near   0DAD     CSEG     00D8 Public   
+  cuad2  . . . . . . . . . . . .        L Near   0E17     CSEG
+  cuad2izq . . . . . . . . . . .        L Near   0E29     CSEG
+  cuad2val . . . . . . . . . . .        L Near   0E2A     CSEG
+  cuad4val . . . . . . . . . . .        L Near   0E76     CSEG
   cuad1val . . . . . . . . . . .        L Near   0E04     CSEG
-  cuad3  . . . . . . . . . . . .        L Near   0E39     CSEG
-  cuad4up  . . . . . . . . . . .        L Near   0E6F     CSEG
+  cuad3  . . . . . . . . . . . .        L Near   0E3D     CSEG
+  cuad4up  . . . . . . . . . . .        L Near   0E75     CSEG
   cuad1izq . . . . . . . . . . .        L Near   0E03     CSEG
   cuad0  . . . . . . . . . . . .        L Near   0DB7     CSEG
-  cuad3val . . . . . . . . . . .        L Near   0E4C     CSEG
-  cuad4  . . . . . . . . . . . .        L Near   0E5D     CSEG
-  cuad3up  . . . . . . . . . . .        L Near   0E4B     CSEG
+  cuad3val . . . . . . . . . . .        L Near   0E50     CSEG
+  cuad4  . . . . . . . . . . . .        L Near   0E63     CSEG
+  cuad3up  . . . . . . . . . . .        L Near   0E4F     CSEG
   cuad1  . . . . . . . . . . . .        L Near   0DF1     CSEG
-inigraf  . . . . . . . . . . . .        P Near   0E89     CSEG     0000 Public   
-prende . . . . . . . . . . . . .        P Near   0E7D     CSEG     0000 Public   
+inigraf  . . . . . . . . . . . .        P Near   0E91     CSEG     0000 Public   
+prende . . . . . . . . . . . . .        P Near   0E85     CSEG     0000 Public   
 
 
 Symbols:
@@ -2190,4 +2193,4 @@ ren2 . . . . . . . . . . . . . .        Word             160h CSEG
 start  . . . . . . . . . . . . .        L Near           22Ch CSEG 
 tool . . . . . . . . . . . . . .        Byte             159h CSEG 
 
-prog12.asm: 641 lines, 2 passes, 40 ms, 0 warnings, 0 errors
+prog12.asm: 644 lines, 2 passes, 58 ms, 0 warnings, 0 errors

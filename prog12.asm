@@ -535,7 +535,6 @@ fin:
 ;     mov afueras,0
 ;     ret
 cuadro proc
-    ; FIX: Doesn't prints the last pixels in col2, ren2 
     mov col1,cx
     mov ren1,dx
     cuad0:
@@ -571,6 +570,7 @@ cuadro proc
     cuad1val:
     cmp cx,col2
     jne cuad1 ;JBE=Jump if not Equal
+    int 10h
     mov cx,col1
     mov dx,ren2
     cuad2: ;Inicia proceso para dibujar linea inferior horizontal
@@ -586,6 +586,7 @@ cuadro proc
     cuad2val:
     cmp cx,col2
     jne cuad2
+    int 10h
     mov cx,col1
     mov dx,ren1
     cuad3: ;Inicia proceso para dibujar linea izquierda vertical
@@ -601,6 +602,7 @@ cuadro proc
     cuad3val:
     cmp dx,ren2
     jne cuad3
+    int 10h
     mov cx,col2
     mov dx,ren1
     cuad4: ;Inicia proceso para dibujar linea derecha vertical
@@ -616,6 +618,7 @@ cuadro proc
     cuad4val:
     cmp dx,ren2
     jne cuad4
+    int 10h
     mov ax,2d
     int 33h
     ret
