@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "echo",
+            "label": "Compile",
             "type": "shell",
             "command": "./test.bat",
             "args": [

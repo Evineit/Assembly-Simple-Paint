@@ -1231,4 +1231,4 @@ ren2 . . . . . . . . . . . . . .        Word             160h CSEG
 start  . . . . . . . . . . . . .        L Near           22Fh CSEG 
 tool . . . . . . . . . . . . . .        Byte             159h CSEG 
 
-proyecto.asm: 653 lines, 2 passes, 28 ms, 0 warnings, 0 errors
+proyecto.asm: 653 lines, 2 passes, 14 ms, 0 warnings, 0 errors

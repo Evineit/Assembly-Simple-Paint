@@ -1,6 +1,0 @@
-test.bat(1) : Error A2210: Syntax error: set
-test.bat(2) : Error A2210: Syntax error: @REM
-test.bat(3) : Error A2210: Syntax error: .
-test.bat(4) : Error A2210: Syntax error: copy
-test.bat(5) : Error A2210: Syntax error: @REM
-test.bat(6) : Error A2210: Syntax error: "C:\Program Files (x86)\DOSBox-0.74\DOSBox.exe"
