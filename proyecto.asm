@@ -468,7 +468,6 @@ etitool5:
     jmp eti10
     
 draw:
-; TODO: Refactor mov cx; mov dx;
     cmp tool,1
     je drawpen
     cmp tool,2

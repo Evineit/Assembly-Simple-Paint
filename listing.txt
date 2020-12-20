@@ -1,6 +1,6 @@
 UASM v2.49, Jun 21 2019, Masm-compatible assembler.
 
-prog12.asm
+proyecto.asm
 00000000                        CSEG    SEGMENT     ; code segment starts here.
                                     org 100h
 00000100  EB60                      jmp eti0
@@ -268,7 +268,6 @@ prog12.asm
 000002EC  720C                      jb eticolor1
 000002EE  2EC606000000              mov colo, 00h
 000002F4  E8E903                    call curcolor 
-                                    ; actualcolor
 000002F7  E935FF                    jmp etip
 
 000002FA                        eticolor1:
@@ -282,7 +281,6 @@ prog12.asm
 0000030E  720C                      jb eticolor2
 00000310  2EC606000004              mov colo, 04h
 00000316  E8C703                    call curcolor 
-                                    ; actualcolor
 00000319  E913FF                    jmp etip
 0000031C                        eticolor2:
 0000031C  81FAB901                  cmp dx,441d
@@ -295,7 +293,6 @@ prog12.asm
 00000330  720C                      jb eticolor3
 00000332  2EC606000002              mov colo, 02h
 00000338  E8A503                    call curcolor 
-                                    ; actualcolor
 0000033B  E9F1FE                    jmp etip
 0000033E                        eticolor3:
 0000033E  81FAB901                  cmp dx,441d
@@ -308,7 +305,6 @@ prog12.asm
 00000352  720C                      jb eticolor4
 00000354  2EC606000006              mov colo, 06h
 0000035A  E88303                    call curcolor 
-                                    ; actualcolor
 0000035D  E9CFFE                    jmp etip
 00000360                        eticolor4:
 00000360  81FAB901                  cmp dx,441d
@@ -321,7 +317,6 @@ prog12.asm
 00000376  720C                      jb eticolor5
 00000378  2EC606000001              mov colo, 01h
 0000037E  E85F03                    call curcolor 
-                                    ; actualcolor
 00000381  E9ABFE                    jmp etip
 00000384                        eticolor5:
 00000384  81FAB901                  cmp dx,441d
@@ -522,7 +517,6 @@ prog12.asm
 000005CD  E9DCFC                    jmp eti10
                                     
 000005D0                        draw:
-                                ; TODO: Refactor mov cx; mov dx;
 000005D0  2E803E000001              cmp tool,1
 000005D6  7423                      je drawpen
 000005D8  2E803E000002              cmp tool,2
@@ -609,7 +603,7 @@ prog12.asm
 
                                 ;------------------ Inicia Zona de Procedimientos ----------------------
 000006B9                        uptpos proc
-000006B9  2E890E0000                mov col,Cx
+000006B9  2E890E0000                mov col,cx
 000006BE  2E89160000                mov ren, dx
 000006C3                            ret
 000006C4                            uptpos endp
@@ -628,7 +622,6 @@ prog12.asm
 000006DF                            ret
 000006E0                            brush endp
 000006E0                        curcolor proc ; Size is defined by cx value at start of procedure
-                                    ; mov col, 105d
 000006E0  2EC7060000F200            mov ren, 242d
 000006E7  B11C                      mov cl, 28d
 000006E9                            curcolor0:
@@ -1238,4 +1231,4 @@ ren2 . . . . . . . . . . . . . .        Word             160h CSEG
 start  . . . . . . . . . . . . .        L Near           22Fh CSEG 
 tool . . . . . . . . . . . . . .        Byte             159h CSEG 
 
-prog12.asm: 660 lines, 2 passes, 16 ms, 0 warnings, 0 errors
+proyecto.asm: 653 lines, 2 passes, 28 ms, 0 warnings, 0 errors
