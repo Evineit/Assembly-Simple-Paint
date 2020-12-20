@@ -19,9 +19,15 @@ It has the following features:
 
 * Current color: Users are only able to see the color selected currently
 
-# Dependencies 
+
+
+# Build
+### Requirements  
 * DOSBox
 * UASM - Macro Assembler 32bit
 
-# Build
 I have included a batch script to run it, named: "test.bat". But you may compiled yourself.
+
+# Run
+"prog.com" is the pre-compiled program ready to be used in dosbox.
+    
